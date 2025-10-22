@@ -135,7 +135,7 @@ void bstFilePrintResults(BST tree, FILE* file) {
     fprintf(file, "\nComparacoes: %d", comp);
 }
 
-NodeBST* consulta(NodeBST *a, char *chave) {
+NodeBST* bstConsulta(NodeBST *a, char *chave) {
     while (a != NULL){
         comp++;
         if (!strcompare(a->game.name, chave)){

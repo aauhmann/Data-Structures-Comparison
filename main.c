@@ -1,6 +1,6 @@
 #include "strcompare.h"
-#include <stdio.h>
 #include "bst.h"
+#include "avl.h"
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
@@ -10,7 +10,7 @@
 #define DESIRED_GAMES argv[2]
 #define OUTPUT_FILE argv[3]
 
-void printResults(float estimatedTime, BST bst);
+void printResults(float estimatedTime, BST bst, AVL avl);
 void fprintResults(FILE* file, float estimatedTime, BST bst);
 
 /// a files\teste.csv files\lista_teste.txt files\saida.txt
@@ -26,6 +26,7 @@ int main(int argc, char* argv[]) {
     }
 
     BST bst = bstNew();
+    AVL avl = avlInitialize();
     char line[1000];
     Game game;
     FILE* steamGamesFile = fopen(STEAM_GAMES, "r");
@@ -36,19 +37,17 @@ int main(int argc, char* argv[]) {
     }
 
     while (fgets(line, 1000, steamGamesFile)) {
-
         char *word = strtok(line, DELIMITERS);      // Gets the game's name(first word)
         strncpy(game.name, word, MAX_NAME_SIZE - 1);
         game.name[MAX_NAME_SIZE - 1] = '\0';        // Ensures null termination
         
         game.time = atof(strtok(NULL, DELIMITERS));     // Gets the average gameplay time(second word)
 
-        bstInsert(&bst, game);        // Inserts into the tree
-
+        //bstInsert(&bst, game);
+        avlInsert(&avl, game);        // Inserts into the tree
     }
 
     fclose(steamGamesFile);
-
 
     float estimatedTime = 0;
     FILE* desiredGamesFile = fopen(argv[2], "r");
@@ -62,10 +61,12 @@ int main(int argc, char* argv[]) {
 
         // char* word = strtok(line, DELIMITERS);
         // printf("\n%s", word);
-        NodeBST* desiredGame = consulta(bst.root, strtok(line, DELIMITERS));    // Gets desired game's name
+        //NodeBST* desiredGame = bstConsulta(bst.root, strtok(line, DELIMITERS));    // Gets desired game's name
+        NodeAVL* desiredGame = avlConsulta(avl.root, strtok(line, DELIMITERS));
         if (desiredGame != NULL) { 
             //printf("\t esta no arquivo");
-            estimatedTime += desiredGame->game.time;
+            //estimatedTime += desiredGame->game.time;
+            estimatedTime += desiredGame->key.time;
 
         }
         //else printf("NAO ACHOU");
@@ -73,11 +74,12 @@ int main(int argc, char* argv[]) {
 
     fclose(desiredGamesFile);
 
-    printResults(estimatedTime, bst);
+    printResults(estimatedTime, bst, avl);
+
 
     FILE* outputFile = fopen(OUTPUT_FILE, "w");
     
-    fprintResults(outputFile, estimatedTime, bst);
+    //fprintResults(outputFile, estimatedTime, bst);
 
     fclose(outputFile);
 
@@ -86,9 +88,10 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-void printResults(float estimatedTime, BST bst) {
+void printResults(float estimatedTime, BST bst, AVL avl) {
     printf("\nTempo estimado: %.2f", estimatedTime);
     bstPrintResults(bst);
+    avlPrintResults(avl);
 }
 
 void fprintResults(FILE* file, float estimatedTime, BST bst) {

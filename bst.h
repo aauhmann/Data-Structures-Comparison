@@ -1,5 +1,6 @@
 #pragma once
 #include "game.h"
+#include <stdio.h>
 
 typedef struct nodeBST {
     Game game;
@@ -51,6 +52,4 @@ void bstPrintResults(BST tree);
 void bstFilePrintResults(BST tree, FILE* file);
 
 //FUNÇÃO VIVIANE
-NodeBST* consulta(NodeBST *a, char *chave);
-
-
+NodeBST* bstConsulta(NodeBST *a, char *chave);

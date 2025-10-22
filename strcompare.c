@@ -3,7 +3,6 @@
 #include <string.h>
 
 int strcompare(const char* str1, const char* str2) {
-
     const char* a = str1;
     const char* b = str2;
 
@@ -18,5 +17,4 @@ int strcompare(const char* str1, const char* str2) {
     }
 
     return tolower(*a) - tolower(*b);
-
 }

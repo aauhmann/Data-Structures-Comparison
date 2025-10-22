@@ -1,8 +1,0 @@
-
-Tempo estimado: 2582.24
-
-Arvore Binaria:
-Num nodos: 9
-Altura: 6
-Num rotacoes: 0
-Comparacoes: 23
