@@ -115,11 +115,11 @@ void bstPrintResults(BST tree) {
     int height = bstHeight(tree);
     int numRotations = 0;
 
-    printf("\n\nArvore Binaria:");
+    printf("\n----- ABP -----");
     printf("\nNum nodos: %d", numNodes);
     printf("\nAltura: %d", height);
     printf("\nNum rotacoes: %d", numRotations);
-    printf("\nComparacoes: %d", comp);
+    printf("\nComparacoes: %d", comp[BSTT]);
 }
 
 void bstFilePrintResults(BST tree, FILE* file) {
@@ -128,16 +128,16 @@ void bstFilePrintResults(BST tree, FILE* file) {
     int height = bstHeight(tree);
     int numRotations = 0;
 
-    fprintf(file, "\n\nArvore Binaria:");
+    fprintf(file, "----- ABP -----");
     fprintf(file, "\nNum nodos: %d", numNodes);
     fprintf(file, "\nAltura: %d", height);
     fprintf(file, "\nNum rotacoes: %d", numRotations);
-    fprintf(file, "\nComparacoes: %d", comp);
+    fprintf(file, "\nComparacoes: %d", comp[BSTT]);
 }
 
 NodeBST* bstConsulta(NodeBST *a, char *chave) {
     while (a != NULL){
-        comp++;
+        comp[BSTT]++;
         if (!strcompare(a->game.name, chave)){
             return a;
         } else {

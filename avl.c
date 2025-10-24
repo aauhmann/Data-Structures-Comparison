@@ -1,7 +1,6 @@
 #include "avl.h"
 #include "strcompare.h"
 #include "global.h"
-#include <stdio.h>
 #include <stdlib.h>
 
 int rotations = 0;
@@ -221,7 +220,7 @@ void avlClear(AVL* tree) {
         avlPostOrder(tree->root, node_clear);
         tree->root = NULL;
         tree->height = 0;
-        printf("\nTree cleared");
+        // printf("\nTree cleared");
     }
 
     rotations = 0;
@@ -432,16 +431,28 @@ void avlPrintResults(AVL tree) {
     int height = tree.height;
     int numRotations = rotations;
 
-    printf("\n\nAVL:");
+    printf("\n\n----- AVL -----");
     printf("\nNum nodos: %d", numNodes);
     printf("\nAltura: %d", height);
     printf("\nNum rotacoes: %d", numRotations);
-    printf("\nComparacoes: %d", comp);
+    printf("\nComparacoes: %d", comp[AVLT]);
+}
+
+void avlFilePrintResults(AVL tree, FILE* file) {
+    int numNodes = avlCountNodes(tree);
+    int height = tree.height;
+    int numRotations = rotations;
+
+    fprintf(file, "\n\n----- AVL -----");
+    fprintf(file, "\nNum nodos: %d", numNodes);
+    fprintf(file, "\nAltura: %d", height);
+    fprintf(file, "\nNum rotacoes: %d", numRotations);
+    fprintf(file, "\nComparacoes: %d", comp[AVLT]);
 }
 
 NodeAVL* avlConsulta(NodeAVL *a, char *chave) {
     while (a != NULL){
-        comp++;
+        comp[AVLT]++;
         if (!strcompare(a->key.name, chave)){
             return a;
         } else {

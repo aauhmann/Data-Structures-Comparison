@@ -2,6 +2,7 @@
 
 #include "game.h"
 #include <stdbool.h>
+#include <stdio.h>
 
 extern int rotations;
 
@@ -35,5 +36,6 @@ void avlPrint(AVL tree);
 void avlClear(AVL* tree);
 void avlFactor(NodeAVL* root, int* factor);
 void avlPrintResults(AVL tree);
+void avlFilePrintResults(AVL tree, FILE* file);
 int avlCountNodes(AVL tree);
 NodeAVL* avlConsulta(NodeAVL *a, char *chave);

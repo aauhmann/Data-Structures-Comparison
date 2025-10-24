@@ -1,3 +1,5 @@
 #pragma once
 
-extern int comp;
+typedef enum {BSTT, AVLT, SPLAYT, RBT} Trees;
+
+extern int comp[4];

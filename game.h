@@ -1,8 +1,6 @@
 #pragma once
 
-#define MAX_NAME_SIZE 100
-
 typedef struct {
-    char name[MAX_NAME_SIZE];
+    char* name;
     float time;
 } Game;
