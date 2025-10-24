@@ -92,6 +92,7 @@ static int bstClearRecur(NodeBST* node) {
     int a = bstClearRecur(node->right);
     a += bstClearRecur(node->left);
 
+    free(node->game.name);
     free(node);
 
     return a;

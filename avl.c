@@ -127,6 +127,7 @@ void node_clear(NodeAVL* node) {
         else parent->right = NULL;
     }
 
+    free(node->key.name);
     free(node);
 }
 
