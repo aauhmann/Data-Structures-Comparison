@@ -3,22 +3,20 @@
 #include "global.h"
 #include <stdlib.h>
 
-int rotations = 0;
-
-bool node_fixFactor(NodeAVL* node);
-void node_print(NodeAVL* node);
-void node_depthAndFactor(NodeAVL* node);
-void node_depthDec(NodeAVL* node);
-void node_depthInc(NodeAVL* node);
-void node_clear(NodeAVL* node);
-bool tree_factorCheck(NodeAVL* root, int* currentDepth, type* key, bool* needRotation);
-void subtree_maxDepth(NodeAVL* root, int* maxDepth);
-void subtree_rotate(AVL* tree, NodeAVL* root);
-void subtree_rotateRight(AVL* tree, NodeAVL* root);
-void subtree_rotateLeft(AVL* tree, NodeAVL* root);
-void subtree_doubleRotateRight(AVL* tree, NodeAVL* root);
-void subtree_doubleRotateLeft(AVL* tree, NodeAVL* root);
-int node_factor(NodeAVL* node);
+bool avlNodeFixFactor(NodeAVL* node);
+void avlNodePrint(NodeAVL* node);
+void avlNodeDepthAndFactor(NodeAVL* node);
+void avlNodeDepthDec(NodeAVL* node);
+void avlNodeDepthInc(NodeAVL* node);
+void avlNodeClear(NodeAVL* node);
+bool avlTreeFactorCheck(NodeAVL* root, int* currentDepth, type* key, bool* needRotation);
+void avlSubtreeMaxDepth(NodeAVL* root, int* maxDepth);
+void avlSubtreeRotate(AVL* tree, NodeAVL* root);
+void avlSubtreeRotateRight(AVL* tree, NodeAVL* root);
+void avlSubtreeRotateLeft(AVL* tree, NodeAVL* root);
+void avlSubtreeDoubleRotateRight(AVL* tree, NodeAVL* root);
+void avlSubtreeDoubleRotateLeft(AVL* tree, NodeAVL* root);
+int avlNodeFactor(NodeAVL* node);
 
 AVL avlInitialize() {
     return (AVL){NULL, 0};
@@ -52,7 +50,7 @@ void avlInsert(AVL* tree, type key) {
                 aux->left = new;
                 new->depth = aux->depth + 1;
                 if (aux->right == NULL)
-                    needRotation = node_fixFactor(aux);
+                    needRotation = avlNodeFixFactor(aux);
                 else aux->factor++;
                 break;
             }
@@ -63,7 +61,7 @@ void avlInsert(AVL* tree, type key) {
                 aux->right = new;
                 new->depth = aux->depth + 1;
                 if (aux->left == NULL)
-                    needRotation = node_fixFactor(aux);
+                    needRotation = avlNodeFixFactor(aux);
                 else aux->factor--;
                 break;
             }
@@ -77,18 +75,18 @@ void avlInsert(AVL* tree, type key) {
     new->parent = aux;
     
     if (needRotation) {
-        subtree_rotate(tree, aux);
+        avlSubtreeRotate(tree, aux);
         avlHeight(tree);
     }
     else if (tree->height < new->depth)
         tree->height = new->depth;
 }
 
-bool node_fixFactor(NodeAVL* node) {
+bool avlNodeFixFactor(NodeAVL* node) {
     bool needRotation = false;
 
     while (node != NULL) {
-        node->factor = node_factor(node);
+        node->factor = avlNodeFactor(node);
 
         if (abs(node->factor) > 1)
             needRotation = true;
@@ -99,27 +97,27 @@ bool node_fixFactor(NodeAVL* node) {
     return needRotation;
 }
 
-void node_print(NodeAVL* node) {
+void avlNodePrint(NodeAVL* node) {
     printf("\n");
     for (int i = 0; i < node->depth; i++)
         printf("=");
     printf("%s", node->key.name);
 }
 
-void node_depthAndFactor(NodeAVL* node) {
+void avlNodeDepthAndFactor(NodeAVL* node) {
     printf("\nDepth: %d", node->depth);
     printf("\nFactor: %d", node->factor);
 }
 
-void node_depthDec(NodeAVL* node) {
+void avlNodeDepthDec(NodeAVL* node) {
     node->depth--;
 }
 
-void node_depthInc(NodeAVL* node) {
+void avlNodeDepthInc(NodeAVL* node) {
     node->depth++;
 }
 
-void node_clear(NodeAVL* node) {
+void avlNodeClear(NodeAVL* node) {
     NodeAVL* parent = node->parent;
 
     if (parent != NULL) {
@@ -131,19 +129,19 @@ void node_clear(NodeAVL* node) {
     free(node);
 }
 
-bool tree_factorCheck(NodeAVL* root, int* currentDepth, type* key, bool* needRotation) {
+bool avlTreeFactorCheck(NodeAVL* root, int* currentDepth, type* key, bool* needRotation) {
     if (abs(root->factor) > 1 && root->depth > *currentDepth) {
         *currentDepth = root->depth;
         *key = root->key;
         *needRotation = true;
     }
-    tree_factorCheck(root->left, currentDepth, key, needRotation);
-    tree_factorCheck(root->right, currentDepth, key, needRotation);
+    avlTreeFactorCheck(root->left, currentDepth, key, needRotation);
+    avlTreeFactorCheck(root->right, currentDepth, key, needRotation);
     
     return *needRotation;
 }
 
-NodeAVL* avlSearchByKey(AVL* tree, type key, NodeFunction function) {
+NodeAVL* avlSearchByKey(AVL* tree, type key, NodeFunctionAVL function) {
     if (avlEmpty(*tree)) {
         printf("\nEmpty tree");
         return NULL;
@@ -168,7 +166,7 @@ NodeAVL* avlSearchByKey(AVL* tree, type key, NodeFunction function) {
     return NULL;
 }
 
-void avlInOrder(NodeAVL* root, NodeFunction function) {
+void avlInOrder(NodeAVL* root, NodeFunctionAVL function) {
     if (root != NULL && function != NULL) {
         avlInOrder(root->left, function);
         function(root);
@@ -176,7 +174,7 @@ void avlInOrder(NodeAVL* root, NodeFunction function) {
     }
 }
 
-void avlPreOrder(NodeAVL* root, NodeFunction function) {
+void avlPreOrder(NodeAVL* root, NodeFunctionAVL function) {
     if (root != NULL && function != NULL) {
         function(root);
         avlPreOrder(root->left, function);
@@ -184,7 +182,7 @@ void avlPreOrder(NodeAVL* root, NodeFunction function) {
     }
 }
 
-void avlPostOrder(NodeAVL* root, NodeFunction function) {
+void avlPostOrder(NodeAVL* root, NodeFunctionAVL function) {
     if (root != NULL && function != NULL) {
         avlPostOrder(root->left, function);
         avlPostOrder(root->right, function);
@@ -194,7 +192,7 @@ void avlPostOrder(NodeAVL* root, NodeFunction function) {
 
 void avlPrint(AVL tree) {
     if (avlEmpty(tree)) printf("\nEmpty tree");
-    else avlPreOrder(tree.root, node_print);
+    else avlPreOrder(tree.root, avlNodePrint);
 }
 
 void avlHeight(AVL* tree) {
@@ -202,15 +200,15 @@ void avlHeight(AVL* tree) {
         tree->height = 0;
     } else {
         tree->height = 0;
-        subtree_maxDepth(tree->root, &tree->height);
+        avlSubtreeMaxDepth(tree->root, &tree->height);
     }
 }
 
-void subtree_maxDepth(NodeAVL* root, int* maxDepth) {
+void avlSubtreeMaxDepth(NodeAVL* root, int* maxDepth) {
     if (root != NULL) {
         if (root->depth > *maxDepth) *maxDepth = root->depth;
-        subtree_maxDepth(root->left, maxDepth);
-        subtree_maxDepth(root->right, maxDepth);
+        avlSubtreeMaxDepth(root->left, maxDepth);
+        avlSubtreeMaxDepth(root->right, maxDepth);
     }
 }
 
@@ -218,16 +216,16 @@ void avlClear(AVL* tree) {
     if (avlEmpty(*tree))
         printf("\nEmpty tree");
     else {
-        avlPostOrder(tree->root, node_clear);
+        avlPostOrder(tree->root, avlNodeClear);
         tree->root = NULL;
         tree->height = 0;
         // printf("\nTree cleared");
     }
 
-    rotations = 0;
+    rotations[AVLT] = 0;
 }
 
-void subtree_rotate(AVL* tree, NodeAVL* root) {
+void avlSubtreeRotate(AVL* tree, NodeAVL* root) {
     NodeAVL* parent;
 
     while (root != NULL) {
@@ -235,17 +233,17 @@ void subtree_rotate(AVL* tree, NodeAVL* root) {
 
         if (root->factor > 1) {
             if (root->left->factor > 0)
-                subtree_rotateRight(tree, root);
+                avlSubtreeRotateRight(tree, root);
             else
-                subtree_doubleRotateRight(tree, root);
+                avlSubtreeDoubleRotateRight(tree, root);
 
             break;
         }
         else if (root->factor < -1) {
             if (root->right->factor < 0)
-                subtree_rotateLeft(tree, root);
+                avlSubtreeRotateLeft(tree, root);
             else
-                subtree_doubleRotateLeft(tree, root);
+                avlSubtreeDoubleRotateLeft(tree, root);
 
             break;
         }
@@ -254,11 +252,11 @@ void subtree_rotate(AVL* tree, NodeAVL* root) {
     }
 }
 
-void subtree_rotateRight(AVL* tree, NodeAVL* root) {
+void avlSubtreeRotateRight(AVL* tree, NodeAVL* root) {
     NodeAVL* aux = root->left;
     NodeAVL* parent = root->parent;
 
-    rotations++;
+    rotations[AVLT]++;
 
     if (root == tree->root)
         tree->root = aux;
@@ -276,18 +274,18 @@ void subtree_rotateRight(AVL* tree, NodeAVL* root) {
 
     root->depth++;
     aux->depth--;
-    avlInOrder(root->right, node_depthInc);
-    avlInOrder(aux->left, node_depthDec);
+    avlInOrder(root->right, avlNodeDepthInc);
+    avlInOrder(aux->left, avlNodeDepthDec);
 
     root->factor = 0;
-    aux->factor = node_factor(aux);
+    aux->factor = avlNodeFactor(aux);
 }
 
-void subtree_rotateLeft(AVL* tree, NodeAVL* root) {
+void avlSubtreeRotateLeft(AVL* tree, NodeAVL* root) {
     NodeAVL* aux = root->right;
     NodeAVL* parent = root->parent;
 
-    rotations++;
+    rotations[AVLT]++;
 
     if (root == tree->root)
         tree->root = aux;
@@ -305,19 +303,19 @@ void subtree_rotateLeft(AVL* tree, NodeAVL* root) {
 
     root->depth++;
     aux->depth--;
-    avlInOrder(root->left, node_depthInc);
-    avlInOrder(aux->right, node_depthDec);
+    avlInOrder(root->left, avlNodeDepthInc);
+    avlInOrder(aux->right, avlNodeDepthDec);
 
     root->factor = 0;
-    aux->factor = node_factor(aux);
+    aux->factor = avlNodeFactor(aux);
 }
 
-void subtree_doubleRotateRight(AVL* tree, NodeAVL* root) {
+void avlSubtreeDoubleRotateRight(AVL* tree, NodeAVL* root) {
     NodeAVL* auxL = root->left;
     NodeAVL* auxR = auxL->right;
     NodeAVL* parent = root->parent;
 
-    rotations += 2;
+    rotations[AVLT] += 2;
 
     if (root == tree->root)
         tree->root = auxR;
@@ -340,9 +338,9 @@ void subtree_doubleRotateRight(AVL* tree, NodeAVL* root) {
 
     root->depth++;
     auxL->depth -= 2;
-    avlInOrder(root->right, node_depthInc);
-    avlInOrder(root->left, node_depthDec);
-    avlInOrder(auxL->right, node_depthDec);
+    avlInOrder(root->right, avlNodeDepthInc);
+    avlInOrder(root->left, avlNodeDepthDec);
+    avlInOrder(auxL->right, avlNodeDepthDec);
 
     if (auxR->factor == 1) root->factor = -1;
     else root->factor = 0;
@@ -350,15 +348,15 @@ void subtree_doubleRotateRight(AVL* tree, NodeAVL* root) {
     if (auxR->factor == -1) auxL->factor = 1;
     else auxL->factor = 0;
 
-    auxR->factor = node_factor(auxR);
+    auxR->factor = avlNodeFactor(auxR);
 }
 
-void subtree_doubleRotateLeft(AVL* tree, NodeAVL* root) {
+void avlSubtreeDoubleRotateLeft(AVL* tree, NodeAVL* root) {
     NodeAVL* auxR = root->right;
     NodeAVL* auxL = auxR->left;
     NodeAVL* parent = root->parent;
 
-    rotations += 2;
+    rotations[AVLT] += 2;
 
     if (root == tree->root)
         tree->root = auxL;
@@ -381,9 +379,9 @@ void subtree_doubleRotateLeft(AVL* tree, NodeAVL* root) {
 
     root->depth++;
     auxL->depth -= 2;
-    avlInOrder(root->left, node_depthInc);
-    avlInOrder(root->right, node_depthDec);
-    avlInOrder(auxR->left, node_depthDec);
+    avlInOrder(root->left, avlNodeDepthInc);
+    avlInOrder(root->right, avlNodeDepthDec);
+    avlInOrder(auxR->left, avlNodeDepthDec);
 
     if (auxL->factor == -1) root->factor = 1;
     else root->factor = 0;
@@ -391,21 +389,21 @@ void subtree_doubleRotateLeft(AVL* tree, NodeAVL* root) {
     if (auxL->factor == 1) auxR->factor = -1;
     else auxR->factor = 0;
 
-    auxL->factor = node_factor(auxL);
+    auxL->factor = avlNodeFactor(auxL);
 }
 
-int node_factor(NodeAVL* node) {
+int avlNodeFactor(NodeAVL* node) {
     int hl = node->depth, hr = node->depth;
 
-    subtree_maxDepth(node->left, &hl);
+    avlSubtreeMaxDepth(node->left, &hl);
 
-    subtree_maxDepth(node->right, &hr);
+    avlSubtreeMaxDepth(node->right, &hr);
 
     return (hl - hr);
 }
 
 void avlFactor(NodeAVL* root, int* factor) {
-    int aux = node_factor(root);
+    int aux = avlNodeFactor(root);
 
     if (aux > *factor) *factor = aux;
 
@@ -428,26 +426,18 @@ int avlCountNodes(AVL tree) {
 }
 
 void avlPrintResults(AVL tree) {
-    int numNodes = avlCountNodes(tree);
-    int height = tree.height;
-    int numRotations = rotations;
-
     printf("\n\n----- AVL -----");
-    printf("\nNum nodos: %d", numNodes);
-    printf("\nAltura: %d", height);
-    printf("\nNum rotacoes: %d", numRotations);
+    printf("\nNum nodos: %d", avlCountNodes(tree));
+    printf("\nAltura: %d", tree.height);
+    printf("\nNum rotacoes: %d", rotations[AVLT]);
     printf("\nComparacoes: %d", comp[AVLT]);
 }
 
 void avlFilePrintResults(AVL tree, FILE* file) {
-    int numNodes = avlCountNodes(tree);
-    int height = tree.height;
-    int numRotations = rotations;
-
     fprintf(file, "\n\n----- AVL -----");
-    fprintf(file, "\nNum nodos: %d", numNodes);
-    fprintf(file, "\nAltura: %d", height);
-    fprintf(file, "\nNum rotacoes: %d", numRotations);
+    fprintf(file, "\nNum nodos: %d", avlCountNodes(tree));
+    fprintf(file, "\nAltura: %d", tree.height);
+    fprintf(file, "\nNum rotacoes: %d", rotations[AVLT]);
     fprintf(file, "\nComparacoes: %d", comp[AVLT]);
 }
 

@@ -4,8 +4,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-extern int rotations;
-
 typedef Game type;
 
 typedef struct NodeAVL {
@@ -22,15 +20,15 @@ typedef struct AVL {
     int height;
 } AVL;
 
-typedef void (*NodeFunction)(NodeAVL*);
+typedef void (*NodeFunctionAVL)(NodeAVL*);
 
 AVL avlInitialize();
 bool avlEmpty(AVL tree);
 void avlInsert(AVL* tree, type key);
-NodeAVL* avlSearchByKey(AVL* tree, type key, NodeFunction function);
-void avlInOrder(NodeAVL* root, NodeFunction function);
-void avlPreOrder(NodeAVL* root, NodeFunction function);
-void avlPostOrder(NodeAVL* root, NodeFunction function);
+NodeAVL* avlSearchByKey(AVL* tree, type key, NodeFunctionAVL function);
+void avlInOrder(NodeAVL* root, NodeFunctionAVL function);
+void avlPreOrder(NodeAVL* root, NodeFunctionAVL function);
+void avlPostOrder(NodeAVL* root, NodeFunctionAVL function);
 void avlHeight(AVL* tree);
 void avlPrint(AVL tree);
 void avlClear(AVL* tree);

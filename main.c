@@ -1,6 +1,7 @@
 #include "strcompare.h"
 #include "bst.h"
 #include "avl.h"
+#include "rbtree.h"
 #include "global.h"
 #include <time.h>
 #include <string.h>
@@ -11,13 +12,14 @@
 #define DESIRED_GAMES argv[2]
 #define OUTPUT_FILE argv[3]
 
-void printResults(float* estimatedTime, float* creationTime, float* searchTime, BST bst, AVL avl);
-void fprintResults(FILE* file, float* estimatedTime, float* creationTime, float* searchTime, BST bst, AVL avl);
+void printResults(float* estimatedTime, float* creationTime, float* searchTime, BST bst, AVL avl, RB rbt);
+void fprintResults(FILE* file, float* estimatedTime, float* creationTime, float* searchTime, BST bst, AVL avl, RB rbt);
 
 /// a files\teste.csv files\lista_teste.txt files\saida.txt
 /// a files\dataset.csv files\lista_jogador1.txt files\saida.txt
 
 int comp[4] = {0, 0, 0, 0};
+int rotations[4] = {0, 0, 0, 0};
 
 int main(int argc, char* argv[]) {
     
@@ -29,6 +31,7 @@ int main(int argc, char* argv[]) {
     
     BST bst = bstNew();
     AVL avl = avlInitialize();
+    RB rbt = rbInitialize();
     char line[1000];
     clock_t begin, end;
     float generationTime[4];
@@ -137,11 +140,56 @@ int main(int argc, char* argv[]) {
     searchTime[AVLT] = (float)(end - begin);      // Stops the AVL search timer
 
 
-    printResults(estimatedTime, generationTime, searchTime, bst, avl);
-    fprintResults(outputFile, estimatedTime, generationTime, searchTime, bst, avl);
+    // RB TREE
+    rewind(steamGamesFile);
+    rewind(desiredGamesFile);
+
+    // Dataset loop
+    begin = clock();       // Starts the RB tree generation timer
+
+    while (fgets(line, sizeof(line), steamGamesFile)) {
+        char *word = strtok(line, DELIMITERS);      // Gets the game's name(first word)
+
+        game.name = (char*)malloc(strlen(word) + 1);
+        
+        strncpy(game.name, word, strlen(word) + 1);
+        
+        game.time = atof(strtok(NULL, DELIMITERS));     // Gets the average gameplay time(second word)
+
+        rbInsert(&rbt, game);      // Inserts into the tree    
+        printf("\n\n");
+        rbPrint(rbt);  
+    }
+
+    end = clock();      // Stops the AVL tree generation timer
+    generationTime[RBT] = (float)(end - begin);
+
+    // Search loop
+    begin = clock();
+
+    while (fgets(line, sizeof(line), desiredGamesFile)) {
+        // char* word = strtok(line, DELIMITERS);
+        // printf("\n%s", word);
+        //NodeBST* desiredGame = bstConsulta(bst.root, strtok(line, DELIMITERS));    // Gets desired game's name
+        NodeRB* desiredGame = rbConsulta(rbt.root, strtok(line, DELIMITERS));
+        if (desiredGame != NULL) { 
+            //printf("\t esta no arquivo");
+            //estimatedTime += desiredGame->game.time;
+            estimatedTime[RBT] += desiredGame->key.time;
+        }
+        //else printf("NAO ACHOU");
+    }
+
+    end = clock();
+    searchTime[RBT] = (float)(end - begin);      // Stops the RB search timer
+
+
+    printResults(estimatedTime, generationTime, searchTime, bst, avl, rbt);
+    fprintResults(outputFile, estimatedTime, generationTime, searchTime, bst, avl, rbt);
     
     bstClear(&bst);
     avlClear(&avl);
+    rbClear(&rbt);
     
     fclose(steamGamesFile);
     fclose(desiredGamesFile);
@@ -152,7 +200,7 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-void printResults(float* estimatedTime, float* generationTime, float* searchTime, BST bst, AVL avl) {
+void printResults(float* estimatedTime, float* generationTime, float* searchTime, BST bst, AVL avl, RB rbt) {
     bstPrintResults(bst);
     printf("\nTempo estimado: %.2f h", estimatedTime[BSTT]);
     printf("\nTempo de criacao: %.2f ms", generationTime[BSTT]);
@@ -162,19 +210,18 @@ void printResults(float* estimatedTime, float* generationTime, float* searchTime
     printf("\nTempo estimado: %.2f h", estimatedTime[AVLT]);
     printf("\nTempo de criacao: %.2f ms", generationTime[AVLT]);
     printf("\nTempo de busca: %.2f ms", searchTime[AVLT]);
+
+    rbPrintResults(rbt);
+    printf("\nTempo estimado: %.2f", estimatedTime[RBT]);
+    printf("\nTempo de criacao: %.2f", generationTime[RBT]);
+    printf("\nTempo de busca: %.2f", searchTime[RBT]);
     
     // printf("\nTempo estimado (SPLAY): %.2f", estimatedTime[SPLAYT]);
-    // printf("\nTempo estimado (RBT): %.2f", estimatedTime[RBT]);
-
     // printf("\nTempo de criacao (SPLAY): %.2f", generationTime[SPLAYT]);
-    // printf("\nTempo de criacao (RBT): %.2f", generationTime[RBT]);
-
     // printf("\nTempo de busca (SPLAY): %.2f", searchTime[SPLAYT]);
-    // printf("\nTempo de busca (RBT): %.2f", searchTime[RBT]);
-
 }
 
-void fprintResults(FILE* file, float* estimatedTime, float* generationTime, float* searchTime, BST bst, AVL avl) {
+void fprintResults(FILE* file, float* estimatedTime, float* generationTime, float* searchTime, BST bst, AVL avl, RB rbt) {
     bstFilePrintResults(bst, file);
     fprintf(file, "\nTempo estimado: %.2f h", estimatedTime[BSTT]);
     fprintf(file, "\nTempo de criacao: %.2f ms", generationTime[BSTT]);
@@ -185,12 +232,13 @@ void fprintResults(FILE* file, float* estimatedTime, float* generationTime, floa
     fprintf(file, "\nTempo de criacao: %.2f ms", generationTime[AVLT]);
     fprintf(file, "\nTempo de busca: %.2f ms", searchTime[AVLT]);
     
-    // fprintf(file, "\nTempo estimado (SPLAY): %.2f", estimatedTime[SPLAYT]);
-    // fprintf(file, "\nTempo estimado (RB): %.2f", estimatedTime[RBT]);
+    rbFilePrintResults(rbt, file);
+    fprintf(file, "\nTempo estimado: %.2f", estimatedTime[RBT]);
+    fprintf(file, "\nTempo de criacao: %.2f", generationTime[RBT]);
+    fprintf(file, "\nTempo de busca: %.2f", searchTime[RBT]);
     
+    // fprintf(file, "\nTempo estimado (SPLAY): %.2f", estimatedTime[SPLAYT]);
     // fprintf(file, "\nTempo de criacao (SPLAY): %.2f", generationTime[SPLAYT]);
-    // fprintf(file, "\nTempo de criacao (RBT): %.2f", generationTime[RBT]);
-
     // fprintf(file, "\nTempo de busca (SPLAY): %.2f", searchTime[SPLAYT]);
-    // fprintf(file, "\nTempo de busca (RBT): %.2f", searchTime[RBT]);
+
 }
