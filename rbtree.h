@@ -31,7 +31,6 @@ NodeRB* rbSearchByKey(RB* tree, type key, NodeFunctionRB function);
 void rbInOrder(NodeRB* root, NodeFunctionRB function);
 void rbPreOrder(NodeRB* root, NodeFunctionRB function);
 void rbPostOrder(NodeRB* root, NodeFunctionRB function);
-void rbHeight(RB* tree);
 void rbPrint(RB tree);
 void rbClear(RB* tree);
 void rbPrintResults(RB tree);

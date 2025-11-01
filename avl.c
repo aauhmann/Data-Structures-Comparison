@@ -337,7 +337,7 @@ void avlSubtreeDoubleRotateRight(AVL* tree, NodeAVL* root) {
     auxR->right = root;
 
     root->depth++;
-    auxL->depth -= 2;
+    auxR->depth -= 2;
     avlInOrder(root->right, avlNodeDepthInc);
     avlInOrder(root->left, avlNodeDepthDec);
     avlInOrder(auxL->right, avlNodeDepthDec);

@@ -3,17 +3,6 @@
 #include "strcompare.h"
 #include <stdlib.h>
 
-void node_print(NodeRB* node);
-void node_depthAndColor(NodeRB* node);
-void node_depthDec(NodeRB* node);
-void node_depthInc(NodeRB* node);
-void node_clear(NodeRB* node);
-void subtree_maxDepth(NodeRB* root, int* maxDepth);
-void subtree_rotateRight(RB* tree, NodeRB* root);
-void subtree_rotateLeft(RB* tree, NodeRB* root);
-void subtree_doubleRotateRight(RB* tree, NodeRB* root);
-void subtree_doubleRotateLeft(RB* tree, NodeRB* root);
-
 RB rbInitialize() {
     return (RB){NULL, 0};
 }
@@ -21,6 +10,132 @@ RB rbInitialize() {
 bool rbEmpty(RB tree) {
     if (tree.root == NULL) return true;
     else return false;
+}
+
+static void rbNodeDepthDec(NodeRB* node) {
+    node->depth--;
+}
+
+static void rbNodeDepthInc(NodeRB* node) {
+    node->depth++;
+}
+
+static void rbSubtreeRotateRight(RB* tree, NodeRB* root) {
+    NodeRB* aux = root->left;
+    NodeRB* parent = root->parent;
+
+    rotations[RBT]++;
+
+    if (root == tree->root)
+        tree->root = aux;
+
+    root->left = aux->right;
+    if (root->left != NULL)
+        root->left->parent = root;
+    aux->parent = parent;
+    if (parent != NULL) {
+        if (parent->left == root) parent->left = aux;
+        else parent->right = aux;
+    }
+    aux->right = root;
+    root->parent = aux;
+
+    root->depth++;
+    aux->depth--;
+    rbInOrder(root->right, rbNodeDepthInc);
+    rbInOrder(aux->left, rbNodeDepthDec);
+}
+
+static void rbSubtreeRotateLeft(RB* tree, NodeRB* root) {
+    NodeRB* aux = root->right;
+    NodeRB* parent = root->parent;
+
+    rotations[RBT]++;
+
+    if (root == tree->root)
+        tree->root = aux;
+
+    root->right = aux->left;
+    if (root->right != NULL)
+        root->right->parent = root;
+    aux->parent = parent;
+    if (parent != NULL) {
+        if (parent->left == root) parent->left = aux;
+        else parent->right = aux;
+    }
+    aux->left = root;
+    root->parent = aux;
+
+    root->depth++;
+    aux->depth--;
+    rbInOrder(root->left, rbNodeDepthInc);
+    rbInOrder(aux->right, rbNodeDepthDec);
+}
+
+static void rbSubtreeDoubleRotateRight(RB* tree, NodeRB* root) {
+    NodeRB* auxL = root->left;
+    NodeRB* auxR = auxL->right;
+    NodeRB* parent = root->parent;
+
+    rotations[RBT] += 2;
+
+    if (root == tree->root)
+        tree->root = auxR;
+
+    auxL->right = auxR->left;
+    if (auxL->right != NULL)
+        auxL->right->parent = auxL;
+    root->left = auxR->right;
+    if (root->left != NULL)
+        root->left->parent = root;
+    auxR->parent = root->parent;
+    if (parent != NULL) {
+        if (parent->left == root) parent->left = auxR;
+        else parent->right = auxR;
+    }
+    root->parent = auxR;
+    auxL->parent = auxR;
+    auxR->left = auxL;
+    auxR->right = root;
+
+    root->depth++;
+    auxR->depth -= 2;
+    rbInOrder(root->right, rbNodeDepthInc);
+    rbInOrder(root->left, rbNodeDepthDec);
+    rbInOrder(auxL->right, rbNodeDepthDec);
+}
+
+static void rbSubtreeDoubleRotateLeft(RB* tree, NodeRB* root) {
+    NodeRB* auxR = root->right;
+    NodeRB* auxL = auxR->left;
+    NodeRB* parent = root->parent;
+
+    rotations[RBT] += 2;
+    
+    if (root == tree->root)
+        tree->root = auxL;
+
+    root->right = auxL->left;
+    if (root->right != NULL)
+        root->right->parent = root;
+    auxR->left = auxL->right;
+    if (auxR->left != NULL) 
+        auxR->left->parent = auxR;
+    auxL->parent = root->parent;
+    if (parent != NULL) {
+        if (parent->left == root) parent->left = auxL;
+        else parent->right = auxL;
+    }
+    root->parent = auxL;
+    auxR->parent = auxL;
+    auxL->left = root;
+    auxL->right = auxR;
+
+    root->depth++;
+    auxL->depth -= 2;
+    rbInOrder(root->left, rbNodeDepthInc);
+    rbInOrder(root->right, rbNodeDepthDec);
+    rbInOrder(auxR->left, rbNodeDepthDec);
 }
 
 static void rbChangeColor(NodeRB* root, NodeRB* node) {
@@ -34,65 +149,77 @@ static void rbChangeColor(NodeRB* root, NodeRB* node) {
     }
 }
 
-static bool rbInsertFix(RB* tree, NodeRB* new, NodeRB* parent) {
-    NodeRB* grandpa;
-    NodeRB* uncle;
-    
-    grandpa = parent->parent;
-
-    if (grandpa->left == parent)
-        uncle = grandpa->right;
-    else
-        uncle = grandpa->left;
-    
-    if (uncle != NULL && uncle->color == RED) {
-        uncle->color = parent->color = new->color = BLACK;
-        
-        return true;
-    }
-    else {  // Means uncle's color is BLACK
-        printf("\n\n%s, ", new->key.name);
-        if (new == parent->left) {
-            if (parent == grandpa->left) {
-                printf("r\n");
-                subtree_rotateRight(tree, parent);
-                rbChangeColor(tree->root, grandpa);
-                rbChangeColor(tree->root, parent);
-            }
-            else {
-                printf("dl\n");
-                subtree_doubleRotateLeft(tree, grandpa);
-                printf("\ns");
-                rbChangeColor(tree->root, grandpa);
-                rbChangeColor(tree->root, new);
-            }
-        }
-        else {  // new == parent->right
-            if (parent == grandpa->right) {
-                printf("l\n");
-                subtree_rotateLeft(tree, parent);
-                rbChangeColor(tree->root, grandpa);
-                rbChangeColor(tree->root, parent);
-            }
-            else {
-                printf("dr\n");
-                subtree_doubleRotateRight(tree, grandpa);
-                rbChangeColor(tree->root, grandpa);
-                rbChangeColor(tree->root, new);
-            }
-        }
-        
-        return true;
+static void rbSubtreeMaxDepth(NodeRB* root, int* maxDepth) {
+    if (root != NULL) {
+        if (root->depth > *maxDepth) *maxDepth = root->depth;
+        rbSubtreeMaxDepth(root->left, maxDepth);
+        rbSubtreeMaxDepth(root->right, maxDepth);
     }
 }
 
-void rbHeight(RB* tree) {
+static void rbHeight(RB* tree) {
     if (rbEmpty(*tree)) {
         tree->height = 0;
     } else {
         tree->height = 0;
-        subtree_maxDepth(tree->root, &tree->height);
+        rbSubtreeMaxDepth(tree->root, &tree->height);
     }
+}
+
+static bool rbInsertFix(RB* tree, NodeRB* new, NodeRB* parent) {
+    NodeRB* grandpa = parent->parent;
+    NodeRB* uncle;
+    bool needHeightRecount = false;
+    
+    while (grandpa != NULL && parent->color == RED) {
+        if (grandpa->left == parent)
+            uncle = grandpa->right;
+        else
+            uncle = grandpa->left;
+        
+        if (uncle != NULL && uncle->color == RED) {
+            uncle->color = parent->color = BLACK;
+            needHeightRecount = true;
+        }
+        else {  // Means uncle's color is BLACK
+            if (new == parent->left) {
+                if (parent == grandpa->left) {
+                    // printf("r\n");
+                    rbSubtreeRotateRight(tree, grandpa);
+                    rbChangeColor(tree->root, grandpa);
+                    rbChangeColor(tree->root, parent);
+                }
+                else {
+                    // printf("dl\n");
+                    rbSubtreeDoubleRotateLeft(tree, grandpa);
+                    rbChangeColor(tree->root, grandpa);
+                    rbChangeColor(tree->root, new);
+                }
+            }
+            else {  // new == parent->right
+                if (parent == grandpa->right) {
+                    // printf("l\n");
+                    rbSubtreeRotateLeft(tree, grandpa);
+                    rbChangeColor(tree->root, grandpa);
+                    rbChangeColor(tree->root, parent);
+                }
+                else {
+                    // printf("dr\n");
+                    rbSubtreeDoubleRotateRight(tree, grandpa);
+                    rbChangeColor(tree->root, grandpa);
+                    rbChangeColor(tree->root, new);
+                }
+            }
+
+            return true;
+        }
+
+        new = parent;
+        parent = grandpa;
+        grandpa = grandpa->parent;
+    }
+
+    return needHeightRecount;
 }
 
 void rbInsert(RB* tree, type key) {
@@ -148,7 +275,7 @@ void rbInsert(RB* tree, type key) {
         tree->height = new->depth;
 }
 
-void node_print(NodeRB* node) {
+static void rbNodePrint(NodeRB* node) {
     printf("\n");
     for (int i = 0; i < node->depth; i++)
         printf("=");
@@ -159,7 +286,7 @@ void node_print(NodeRB* node) {
         printf("(BLACK)");
 }
 
-void node_depthAndColor(NodeRB* node) {
+static void rbNodeDepthAndColor(NodeRB* node) {
     printf("\nDepth: %d", node->depth);
     if (node->color == RED)
         printf("\nColor: RED");
@@ -167,15 +294,7 @@ void node_depthAndColor(NodeRB* node) {
         printf("\nColor: BLACK");
 }
 
-void node_depthDec(NodeRB* node) {
-    node->depth--;
-}
-
-void node_depthInc(NodeRB* node) {
-    node->depth++;
-}
-
-void node_clear(NodeRB* node) {
+static void rbNodeClear(NodeRB* node) {
     NodeRB* parent = node->parent;
 
     if (parent != NULL) {
@@ -238,22 +357,14 @@ void rbPostOrder(NodeRB* root, NodeFunctionRB function) {
 
 void rbPrint(RB tree) {
     if (rbEmpty(tree)) printf("\nEmpty tree");
-    else rbPreOrder(tree.root, node_print);
-}
-
-void subtree_maxDepth(NodeRB* root, int* maxDepth) {
-    if (root != NULL) {
-        if (root->depth > *maxDepth) *maxDepth = root->depth;
-        subtree_maxDepth(root->left, maxDepth);
-        subtree_maxDepth(root->right, maxDepth);
-    }
+    else rbPreOrder(tree.root, rbNodePrint);
 }
 
 void rbClear(RB* tree) {
     if (rbEmpty(*tree))
         printf("\nEmpty tree");
     else {
-        rbPostOrder(tree->root, node_clear);
+        rbPostOrder(tree->root, rbNodeClear);
         tree->root = NULL;
         tree->height = 0;
         // printf("\nTree cleared");
@@ -262,137 +373,14 @@ void rbClear(RB* tree) {
     rotations[RBT] = 0;
 }
 
-void subtree_rotateRight(RB* tree, NodeRB* root) {
-    NodeRB* aux = root->left;
-    NodeRB* parent = root->parent;
-
-    rotations[RBT]++;
-
-    if (root == tree->root)
-        tree->root = aux;
-
-    root->left = aux->right;
-    if (root->left != NULL)
-        root->left->parent = root;
-    aux->parent = parent;
-    if (parent != NULL) {
-        if (parent->left == root) parent->left = aux;
-        else parent->right = aux;
-    }
-    aux->right = root;
-    root->parent = aux;
-
-    root->depth++;
-    aux->depth--;
-    rbInOrder(root->right, node_depthInc);
-    rbInOrder(aux->left, node_depthDec);
-}
-
-void subtree_rotateLeft(RB* tree, NodeRB* root) {
-    NodeRB* aux = root->right;
-    NodeRB* parent = root->parent;
-
-    rotations[RBT]++;
-
-    if (root == tree->root)
-        tree->root = aux;
-
-    root->right = aux->left;
-    if (root->right != NULL)
-        root->right->parent = root;
-    aux->parent = parent;
-    if (parent != NULL) {
-        if (parent->left == root) parent->left = aux;
-        else parent->right = aux;
-    }
-    aux->left = root;
-    root->parent = aux;
-
-    root->depth++;
-    aux->depth--;
-    rbInOrder(root->left, node_depthInc);
-    rbInOrder(aux->right, node_depthDec);
-}
-
-void subtree_doubleRotateRight(RB* tree, NodeRB* root) {
-    NodeRB* auxL = root->left;
-    NodeRB* auxR = auxL->right;
-    NodeRB* parent = root->parent;
-
-    rotations[RBT] += 2;
-
-    if (root == tree->root)
-        tree->root = auxR;
-
-    auxL->right = auxR->left;
-    if (auxL->right != NULL)
-        auxL->right->parent = auxL;
-    root->left = auxR->right;
-    if (root->left != NULL)
-        root->left->parent = root;
-    auxR->parent = root->parent;
-    if (parent != NULL) {
-        if (parent->left == root) parent->left = auxR;
-        else parent->right = auxR;
-    }
-    root->parent = auxR;
-    auxL->parent = auxR;
-    auxR->left = auxL;
-    auxR->right = root;
-
-    root->depth++;
-    auxL->depth -= 2;
-    rbInOrder(root->right, node_depthInc);
-    rbInOrder(root->left, node_depthDec);
-    rbInOrder(auxL->right, node_depthDec);
-}
-
-void subtree_doubleRotateLeft(RB* tree, NodeRB* root) {
-    NodeRB* auxR = root->right;
-    NodeRB* auxL = auxR->left;
-    printf("\n j");
-    NodeRB* parent = root->parent;
-
-    rotations[RBT] += 2;
-    
-    if (root == tree->root)
-        tree->root = auxL;
-
-    root->right = auxL->left;
-    if (root->right != NULL)
-        root->right->parent = root;
-    auxR->left = auxL->right;
-    if (auxR->left != NULL) 
-        auxR->left->parent = auxR;
-    auxL->parent = root->parent;
-    if (parent != NULL) {
-        if (parent->left == root) parent->left = auxL;
-        else parent->right = auxL;
-    }
-    root->parent = auxL;
-    auxR->parent = auxL;
-    auxL->left = root;
-    auxL->right = auxR;
-
-    root->depth++;
-    auxL->depth -= 2;
-    rbInOrder(root->left, node_depthInc);
-    rbInOrder(root->right, node_depthDec);
-    rbInOrder(auxR->left, node_depthDec);
-}
-
-static int RBCountNodesRecur(NodeRB* a) {
-
+static int rbCountNodesRecur(NodeRB* a) {
     if (a == NULL) return 0;
 
-    return RBCountNodesRecur(a->left) + RBCountNodesRecur(a->right) + 1;
-    
+    return rbCountNodesRecur(a->left) + rbCountNodesRecur(a->right) + 1;
 }
 
 int rbCountNodes(RB tree) {
-
-    return RBCountNodesRecur(tree.root);
-    
+    return rbCountNodesRecur(tree.root);
 }
 
 void rbPrintResults(RB tree) {
@@ -411,16 +399,16 @@ void rbFilePrintResults(RB tree, FILE* file) {
     fprintf(file, "\nComparacoes: %d", comp[RBT]);
 }
 
-NodeRB* rbConsulta(NodeRB *a, char *chave) {
-    while (a != NULL){
+NodeRB* rbConsulta(NodeRB* root, char* key) {
+    while (root != NULL){
         comp[RBT]++;
-        if (!strcompare(a->key.name, chave)){
-            return a;
+        if (!strcompare(root->key.name, key)){
+            return root;
         } else {
-            if (strcompare(a->key.name, chave) > 0)
-                a = a->left;
+            if (strcompare(root->key.name, key) > 0)
+                root = root->left;
             else
-                a = a->right;
+                root = root->right;
         }
     }
     return NULL;
