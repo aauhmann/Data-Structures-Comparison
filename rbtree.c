@@ -107,6 +107,8 @@ static void rbSubtreeDoubleRotateRight(RB* tree, NodeRB* root) {
 
 static void rbSubtreeDoubleRotateLeft(RB* tree, NodeRB* root) {
     NodeRB* auxR = root->right;
+    // printf("var, ");
+    // if (auxR == NULL) printf("auxR == NULL, ");
     NodeRB* auxL = auxR->left;
     NodeRB* parent = root->parent;
 
@@ -130,12 +132,14 @@ static void rbSubtreeDoubleRotateLeft(RB* tree, NodeRB* root) {
     auxR->parent = auxL;
     auxL->left = root;
     auxL->right = auxR;
+    // printf("nodes done, ");
 
     root->depth++;
     auxL->depth -= 2;
     rbInOrder(root->left, rbNodeDepthInc);
     rbInOrder(root->right, rbNodeDepthDec);
     rbInOrder(auxR->left, rbNodeDepthDec);
+    // printf("depth done, ");
 }
 
 static void rbChangeColor(NodeRB* root, NodeRB* node) {
@@ -166,59 +170,107 @@ static void rbHeight(RB* tree) {
     }
 }
 
+static int rbBlackHeightCheckRecursion(NodeRB* node) {
+    if (node == NULL)
+        return 1;  // NULL conta como nó BLACK
+    
+    // Calcula altura negra dos filhos esquerdo e direito
+    int leftHeight = rbBlackHeightCheckRecursion(node->left);
+    int rightHeight = rbBlackHeightCheckRecursion(node->right);
+    
+    // Se algum filho tem violação, propaga o erro
+    if (leftHeight == -1 || rightHeight == -1)
+        return -1;
+    
+    // Se alturas negras diferentes, há VIOLAÇÃO
+    if (leftHeight != rightHeight)
+        return -1;
+    
+    // Retorna altura negra deste caminho
+    if (node->color == BLACK)
+        return leftHeight + 1;  // Adiciona 1 se este nó é BLACK
+    else
+        return leftHeight;      // Mantém se este nó é RED
+}
+
+// ✅ Retorna TRUE se há VIOLAÇÃO (precisa rotacionar)
+// Retorna FALSE se está VÁLIDO (não precisa rotacionar)
+static bool rbBlackHeightCheck(NodeRB* root) {
+    if (root == NULL)
+        return false;  // Árvore vazia é válida
+    
+    int height = rbBlackHeightCheckRecursion(root);
+    return height == -1;  // TRUE se há violação (-1), FALSE se válido
+}
+
 static bool rbInsertFix(RB* tree, NodeRB* new, NodeRB* parent) {
     NodeRB* grandpa = parent->parent;
     NodeRB* uncle;
     bool needHeightRecount = false;
     
-    while (grandpa != NULL && parent->color == RED) {
+    while (grandpa != NULL && parent->color == RED) {   // Esse parent->color == RED o copilot q disse q era pra por
+        // printf("\nw, ");
+        // if (new == NULL) printf("new == NULL, ");
+        // if (parent == NULL) printf("parent == NULL, ");
+        // if (grandpa == NULL) printf("grandpa == NULL, ");
+        // if (grandpa->left == NULL) printf("grandpa->left == NULL, ");
+        // if (grandpa->right == NULL) printf("grandpa->right == NULL, ");
+
         if (grandpa->left == parent)
             uncle = grandpa->right;
         else
             uncle = grandpa->left;
         
         if (uncle != NULL && uncle->color == RED) {
+            // printf("red, ");
             uncle->color = parent->color = BLACK;
+            // grandpa->color = RED;    // Se ativa essa linha a arvore fica com a altura completamente cagada (da muita merda)
             needHeightRecount = true;
+
+            new = parent;
+            parent = grandpa;
+            grandpa = grandpa->parent;
+            // printf("g = g->p, ");
+            // if (grandpa == NULL) printf("grandpa == NULL, ");
         }
         else {  // Means uncle's color is BLACK
+            // printf("black, ");
+
             if (new == parent->left) {
                 if (parent == grandpa->left) {
-                    // printf("r\n");
+                    // printf("\tr, ");
                     rbSubtreeRotateRight(tree, grandpa);
-                    rbChangeColor(tree->root, grandpa);
                     rbChangeColor(tree->root, parent);
+                    rbChangeColor(tree->root, grandpa);
                 }
                 else {
-                    // printf("dl\n");
+                    // printf("\tdl, ");
                     rbSubtreeDoubleRotateLeft(tree, grandpa);
-                    rbChangeColor(tree->root, grandpa);
                     rbChangeColor(tree->root, new);
+                    rbChangeColor(tree->root, grandpa);
                 }
             }
             else {  // new == parent->right
                 if (parent == grandpa->right) {
-                    // printf("l\n");
+                    // printf("\tl, ");
                     rbSubtreeRotateLeft(tree, grandpa);
-                    rbChangeColor(tree->root, grandpa);
                     rbChangeColor(tree->root, parent);
+                    rbChangeColor(tree->root, grandpa);
                 }
                 else {
-                    // printf("dr\n");
+                    // printf("\tdr, ");
                     rbSubtreeDoubleRotateRight(tree, grandpa);
-                    rbChangeColor(tree->root, grandpa);
                     rbChangeColor(tree->root, new);
+                    rbChangeColor(tree->root, grandpa);
                 }
             }
-
+            // printf("loop out");
+            tree->root->color = BLACK;
             return true;
         }
-
-        new = parent;
-        parent = grandpa;
-        grandpa = grandpa->parent;
     }
-
+    // printf("loop out");
+    tree->root->color = BLACK;
     return needHeightRecount;
 }
 
@@ -246,6 +298,7 @@ void rbInsert(RB* tree, type key) {
             if (aux->left == NULL) {
                 aux->left = new;
                 new->depth = aux->depth + 1;
+                new->parent = aux;
                 if (aux->color == RED)    // If the parent is BLACK
                     needRotation = rbInsertFix(tree, new, aux);
                 break;
@@ -256,6 +309,7 @@ void rbInsert(RB* tree, type key) {
             if (aux->right == NULL) {
                 aux->right = new;
                 new->depth = aux->depth + 1;
+                new->parent = aux;
                 if (aux->color == RED)
                     needRotation = rbInsertFix(tree, new, aux);
                 break;
@@ -266,8 +320,6 @@ void rbInsert(RB* tree, type key) {
             return;
         }
     }
-
-    new->parent = aux;
     
     if (needRotation)
         rbHeight(tree);
@@ -383,10 +435,24 @@ int rbCountNodes(RB tree) {
     return rbCountNodesRecur(tree.root);
 }
 
+static int rbHeightRecursion(NodeRB* root) {
+    if (root == NULL)
+        return 0;  // Altura de árvore vazia é 0
+    
+    int leftHeight = rbHeightRecursion(root->left);
+    int rightHeight = rbHeightRecursion(root->right);
+    
+    // Retorna a maior altura entre esquerda e direita + 1 (raiz)
+    if (leftHeight > rightHeight)
+        return leftHeight + 1;
+    else
+        return rightHeight + 1;
+}
+
 void rbPrintResults(RB tree) {
     printf("\n\n----- RB -----");
     printf("\nNum nodos: %d", rbCountNodes(tree));
-    printf("\nAltura: %d", tree.height);
+    printf("\nAltura: %d", rbHeightRecursion(tree.root));
     printf("\nNum rotacoes: %d", rotations[RBT]);
     printf("\nComparacoes: %d", comp[RBT]);
 }

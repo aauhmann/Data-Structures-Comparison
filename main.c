@@ -186,7 +186,7 @@ int main(int argc, char* argv[]) {
     end = clock();
     searchTime[RBT] = (float)(end - begin);      // Stops the RB search timer
 
-    // rbPrint(rbt);
+    rbPrint(rbt);
 
 
     printResults(estimatedTime, generationTime, searchTime, bst, avl, rbt);
