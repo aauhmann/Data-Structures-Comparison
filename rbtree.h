@@ -10,7 +10,7 @@ typedef Game type;
 
 typedef struct NodeRB {
     Game key;
-    short int color;
+    Color color;
     int depth;
     struct NodeRB* parent;
     struct NodeRB* left;
@@ -37,3 +37,6 @@ void rbPrintResults(RB tree);
 void rbFilePrintResults(RB tree, FILE* file);
 int rbCountNodes(RB tree);
 NodeRB* rbConsulta(NodeRB *a, char *chave);
+
+int leandroInsert2(RB* tree, Game game);
+void rbtPrint(RB tree);
