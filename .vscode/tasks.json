@@ -12,6 +12,7 @@
                 "-Iinclude/utils",
                 "src/*.c",
                 "src/trees/*.c",
+                "src/utils/*.c",
                 "-o",
                 "${workspaceFolder}/program.exe"
             ],
