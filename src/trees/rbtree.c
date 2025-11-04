@@ -12,14 +12,6 @@ bool rbEmpty(RB tree) {
     else return false;
 }
 
-static void rbNodeDepthDec(NodeRB* node) {
-    node->depth--;
-}
-
-static void rbNodeDepthInc(NodeRB* node) {
-    node->depth++;
-}
-
 static void rbSubtreeRotateRight(RB* tree, NodeRB* root) {
     NodeRB* aux = root->left;
     NodeRB* parent = root->parent;
@@ -168,39 +160,6 @@ static void rbHeight(RB* tree) {
         tree->height = 0;
         rbSubtreeMaxDepth(tree->root, &tree->height);
     }
-}
-
-static int rbBlackHeightCheckRecursion(NodeRB* node) {
-    if (node == NULL)
-        return 1;  // NULL conta como nó BLACK
-    
-    // Calcula altura negra dos filhos esquerdo e direito
-    int leftHeight = rbBlackHeightCheckRecursion(node->left);
-    int rightHeight = rbBlackHeightCheckRecursion(node->right);
-    
-    // Se algum filho tem violação, propaga o erro
-    if (leftHeight == -1 || rightHeight == -1)
-        return -1;
-    
-    // Se alturas negras diferentes, há VIOLAÇÃO
-    if (leftHeight != rightHeight)
-        return -1;
-    
-    // Retorna altura negra deste caminho
-    if (node->color == BLACK)
-        return leftHeight + 1;  // Adiciona 1 se este nó é BLACK
-    else
-        return leftHeight;      // Mantém se este nó é RED
-}
-
-// ✅ Retorna TRUE se há VIOLAÇÃO (precisa rotacionar)
-// Retorna FALSE se está VÁLIDO (não precisa rotacionar)
-static bool rbBlackHeightCheck(NodeRB* root) {
-    if (root == NULL)
-        return false;  // Árvore vazia é válida
-    
-    int height = rbBlackHeightCheckRecursion(root);
-    return height == -1;  // TRUE se há violação (-1), FALSE se válido
 }
 
 static bool rbInsertFix(RB* tree, NodeRB* new, NodeRB* parent) {
@@ -354,19 +313,6 @@ static void rbtPrintRecur(NodeRB* a, int cont) {
 void rbtPrint(RB tree) {
 
     rbtPrintRecur(tree.root, 0);
-}
-
-
-
-
-
-
-static void rbNodeDepthAndColor(NodeRB* node) {
-    printf("\nDepth: %d", node->depth);
-    if (node->color == RED)
-        printf("\nColor: RED");
-    else
-        printf("\nColor: BLACK");
 }
 
 static void rbNodeClear(NodeRB* node) {
@@ -591,7 +537,7 @@ static int rbtBalance(RB* tree, NodeRB* insertedNode) {
 int leandroInsert2(RB* tree, Game game) {
 
     NodeRB* newNode = (NodeRB*)malloc(sizeof(NodeRB));
-    bool needRotation = false;
+    //bool needRotation = false;
     
     newNode->key = game;
     newNode->left = NULL; 

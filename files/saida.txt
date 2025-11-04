@@ -4,7 +4,7 @@ Altura: 28
 Num rotacoes: 0
 Comparacoes: 3049
 Tempo estimado: 2684.73 h
-Tempo de criacao: 10.00 ms
+Tempo de criacao: 31.00 ms
 Tempo de busca: 0.00 ms
 
 ----- AVL -----
@@ -13,7 +13,7 @@ Altura: 14
 Num rotacoes: 2726
 Comparacoes: 2154
 Tempo estimado: 2684.73 h
-Tempo de criacao: 182.00 ms
+Tempo de criacao: 197.00 ms
 Tempo de busca: 0.00 ms
 
 ----- RB -----
@@ -22,5 +22,5 @@ Altura: 0
 Num rotacoes: 2234
 Comparacoes: 2162
 Tempo estimado: 2684.73 h
-Tempo de criacao: 0.00 ms
+Tempo de criacao: 10.00 ms
 Tempo de busca: 0.00 ms
