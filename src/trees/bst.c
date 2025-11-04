@@ -136,16 +136,16 @@ void bstFilePrintResults(BST tree, FILE* file) {
     fprintf(file, "\nComparacoes: %d", comp[BSTT]);
 }
 
-NodeBST* bstConsulta(NodeBST *a, char *chave) {
-    while (a != NULL){
+NodeBST* bstSearch(NodeBST* root, char* key) {
+    while (root != NULL){
         comp[BSTT]++;
-        if (!strcompare(a->game.name, chave)){
-            return a;
+        if (!strcompare(root->game.name, key)){
+            return root;
         } else {
-            if (strcompare(a->game.name, chave) > 0)
-                a = a->left;
+            if (strcompare(root->game.name, key) > 0)
+                root = root->left;
             else
-                a = a->right;
+                root = root->right;
         }
     }
  return NULL;

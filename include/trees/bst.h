@@ -16,7 +16,7 @@ typedef struct {
 /// @return The new BST
 BST bstNew();
 
-/// @brief Inserts a new game into the bst
+/// @brief Inserts a new game into the BST
 /// @param tree 
 /// @param game 
 /// @return 0 == ERROR, 1 == SUCCESS
@@ -33,10 +33,10 @@ void bstPrint(BST tree);
 
 /// @brief Calculate the height of a BST
 /// @param tree 
-/// @return Height of the BSY
+/// @return Height of the BST
 int bstHeight(BST tree);
 
-/// @brief Clears a bst
+/// @brief Clears a BST
 /// @param tree 
 /// @return 0 == ERROR, 1 == SUCCESS
 int bstClear(BST* tree);
@@ -52,4 +52,4 @@ void bstPrintResults(BST tree);
 void bstFilePrintResults(BST tree, FILE* file);
 
 //FUNÇÃO VIVIANE
-NodeBST* bstConsulta(NodeBST *a, char *chave);
+NodeBST* bstSearch(NodeBST* root, char* key);

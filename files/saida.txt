@@ -13,12 +13,12 @@ Altura: 14
 Num rotacoes: 2726
 Comparacoes: 2154
 Tempo estimado: 2684.73 h
-Tempo de criacao: 121.00 ms
+Tempo de criacao: 114.00 ms
 Tempo de busca: 0.00 ms
 
------ RB -----
+----- RBT -----
 Num nodos: 3598
-Altura: 0
+Altura: 15
 Num rotacoes: 2234
 Comparacoes: 2162
 Tempo estimado: 2684.73 h

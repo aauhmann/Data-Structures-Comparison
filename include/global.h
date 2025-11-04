@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum {BSTT, AVLT, SPLAYT, RBT} Trees;
+typedef enum {BSTT, AVLT, SPLAYT, RBTT} Trees;
 
 typedef enum { LEFT, RIGHT } Direction;
 
