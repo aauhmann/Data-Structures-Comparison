@@ -11,7 +11,6 @@
             ], /// a files\dataset.csv files\lista_jogador1.txt files\saida.txt
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
-            "console": "integratedTerminal",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
