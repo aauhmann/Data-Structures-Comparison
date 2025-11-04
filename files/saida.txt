@@ -1,26 +1,26 @@
 ----- ABP -----
-Num nodos: 15
-Altura: 7
+Num nodos: 3598
+Altura: 28
 Num rotacoes: 0
-Comparacoes: 25
-Tempo estimado: 2582.24 h
-Tempo de criacao: 0.00 ms
+Comparacoes: 3049
+Tempo estimado: 2684.73 h
+Tempo de criacao: 10.00 ms
 Tempo de busca: 0.00 ms
 
 ----- AVL -----
-Num nodos: 15
-Altura: 5
-Num rotacoes: 8
-Comparacoes: 16
-Tempo estimado: 2582.24 h
-Tempo de criacao: 0.00 ms
+Num nodos: 3598
+Altura: 14
+Num rotacoes: 2726
+Comparacoes: 2154
+Tempo estimado: 2684.73 h
+Tempo de criacao: 182.00 ms
 Tempo de busca: 0.00 ms
 
 ----- RB -----
-Num nodos: 15
-Altura: 5
-Num rotacoes: 6
-Comparacoes: 18
-Tempo estimado: 2582.24 h
+Num nodos: 3598
+Altura: 0
+Num rotacoes: 2234
+Comparacoes: 2162
+Tempo estimado: 2684.73 h
 Tempo de criacao: 0.00 ms
 Tempo de busca: 0.00 ms
