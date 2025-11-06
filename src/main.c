@@ -6,6 +6,7 @@
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
+#include "cronometer.h"
 
 #define DELIMITERS ",\n"
 #define STEAM_GAMES argv[1]
@@ -32,6 +33,14 @@ int main(int argc, char* argv[]) {
     BST bst = bstNew();
     AVL avl = avlInitialize();
     RBT rbt = rbtNew();
+
+    Cronometer cronBST = cronNew();
+    Cronometer cronAVL = cronNew();
+    Cronometer cronRBT = cronNew();
+    //Cronometer cronSPT = cronNew();
+
+
+
     char line[1000];
     clock_t begin, end;
     float generationTime[4];
@@ -59,8 +68,11 @@ int main(int argc, char* argv[]) {
     }
 
 
+
+
+
     // BST TREE
-    begin = clock();       // Starts the BST generation timer
+    cronStart(&cronBST);
 
     // Dataset loop
     while (fgets(line, sizeof(line), steamGamesFile)) {
@@ -75,11 +87,11 @@ int main(int argc, char* argv[]) {
         bstInsert(&bst, game);      // Inserts into the tree       
     }
 
-    end = clock();      // Stops the BST generation timer
-    generationTime[BSTT] = (float)(end - begin);
+    cronStop(&cronBST);
+    generationTime[BSTT] = cronBST.millisec;
     
     // Search loop
-    begin = clock();     // Starts the BST search timer
+    cronStart(&cronBST);     // Starts the BST search timer
 
     while (fgets(line, sizeof(line), desiredGamesFile)) {
         // char* word = strtok(line, DELIMITERS);
@@ -94,8 +106,11 @@ int main(int argc, char* argv[]) {
         //else printf("NAO ACHOU");
     }
 
-    end = clock();      // Stops the BST search timer
-    searchTime[BSTT] = (float)(end - begin);
+    cronStop(&cronBST);      // Stops the BST search timer
+    searchTime[BSTT] = cronBST.millisec;
+
+
+
 
 
     // AVL TREE
@@ -103,7 +118,7 @@ int main(int argc, char* argv[]) {
     rewind(desiredGamesFile);
 
     // Dataset loop
-    begin = clock();       // Starts the AVL tree generation timer
+    cronStart(&cronAVL);       // Starts the AVL tree generation timer
 
     while (fgets(line, sizeof(line), steamGamesFile)) {
         char *word = strtok(line, DELIMITERS);      // Gets the game's name(first word)
@@ -120,11 +135,11 @@ int main(int argc, char* argv[]) {
         // printf("\n");
     }
 
-    end = clock();      // Stops the AVL tree generation timer
-    generationTime[AVLT] = (float)(end - begin);
+    cronStop(&cronAVL);      // Stops the AVL tree generation timer
+    generationTime[AVLT] = cronAVL.millisec;
 
     // Search loop
-    begin = clock();
+    cronStart(&cronAVL);
 
     while (fgets(line, sizeof(line), desiredGamesFile)) {
         // char* word = strtok(line, DELIMITERS);
@@ -141,6 +156,10 @@ int main(int argc, char* argv[]) {
 
     end = clock();
     searchTime[AVLT] = (float)(end - begin);      // Stops the AVL search timer
+
+
+
+
 
 
     // RBT TREE
@@ -186,7 +205,8 @@ int main(int argc, char* argv[]) {
     end = clock();
     searchTime[RBTT] = (float)(end - begin);      // Stops the RBT search timer
 
-    // rbPrint(rbt);
+
+    
 
 
     printResults(estimatedTime, generationTime, searchTime, bst, avl, rbt);

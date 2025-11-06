@@ -9,7 +9,7 @@ void avlNodeDepthAndFactor(NodeAVL* node);
 void avlNodeDepthDec(NodeAVL* node);
 void avlNodeDepthInc(NodeAVL* node);
 void avlNodeClear(NodeAVL* node);
-bool avlTreeFactorCheck(NodeAVL* root, int* currentDepth, type* key, bool* needRotation);
+//bool avlTreeFactorCheck(NodeAVL* root, int* currentDepth, type* key, bool* needRotation);
 void avlSubtreeMaxDepth(NodeAVL* root, int* maxDepth);
 void avlSubtreeRotate(AVL* tree, NodeAVL* root);
 void avlSubtreeRotateRight(AVL* tree, NodeAVL* root);
@@ -129,17 +129,17 @@ void avlNodeClear(NodeAVL* node) {
     free(node);
 }
 
-bool avlTreeFactorCheck(NodeAVL* root, int* currentDepth, type* key, bool* needRotation) {
-    if (abs(root->factor) > 1 && root->depth > *currentDepth) {
-        *currentDepth = root->depth;
-        *key = root->key;
-        *needRotation = true;
-    }
-    avlTreeFactorCheck(root->left, currentDepth, key, needRotation);
-    avlTreeFactorCheck(root->right, currentDepth, key, needRotation);
+// bool avlTreeFactorCheck(NodeAVL* root, int* currentDepth, type* key, bool* needRotation) {
+//     if (abs(root->factor) > 1 && root->depth > *currentDepth) {
+//         *currentDepth = root->depth;
+//         *key = root->key;
+//         *needRotation = true;
+//     }
+//     avlTreeFactorCheck(root->left, currentDepth, key, needRotation);
+//     avlTreeFactorCheck(root->right, currentDepth, key, needRotation);
     
-    return *needRotation;
-}
+//     return *needRotation;
+// }
 
 NodeAVL* avlSearchByKey(AVL* tree, type key, NodeFunctionAVL function) {
     if (avlEmpty(*tree)) {
