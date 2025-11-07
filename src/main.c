@@ -42,7 +42,6 @@ int main(int argc, char* argv[]) {
 
 
     char line[1000];
-    clock_t begin, end;
     float generationTime[4];
     float searchTime[4];
     float estimatedTime[4] = {0, 0, 0, 0};
@@ -154,8 +153,8 @@ int main(int argc, char* argv[]) {
         //else printf("NAO ACHOU");
     }
 
-    end = clock();
-    searchTime[AVLT] = (float)(end - begin);      // Stops the AVL search timer
+    cronStop(&cronAVL);
+    searchTime[AVLT] = cronAVL.millisec;      // Stops the AVL search timer
 
 
 
@@ -167,7 +166,7 @@ int main(int argc, char* argv[]) {
     rewind(desiredGamesFile);
 
     // Dataset loop
-    begin = clock();       // Starts the RBT tree generation timer
+    cronStart(&cronRBT);      // Starts the RBT tree generation timer
 
     while (fgets(line, sizeof(line), steamGamesFile)) {
         char *word = strtok(line, DELIMITERS);      // Gets the game's name(first word)
@@ -183,11 +182,11 @@ int main(int argc, char* argv[]) {
         // rbPrint(rbt);  
     }
 
-    end = clock();      // Stops the AVL tree generation timer
-    generationTime[RBTT] = (float)(end - begin);
+    cronStop(&cronRBT);      // Stops the AVL tree generation timer
+    generationTime[RBTT] = cronRBT.millisec;
 
     // Search loop
-    begin = clock();
+    cronStart(&cronRBT);
 
     while (fgets(line, sizeof(line), desiredGamesFile)) {
         // char* word = strtok(line, DELIMITERS);
@@ -202,8 +201,8 @@ int main(int argc, char* argv[]) {
         //else printf("NAO ACHOU");
     }
 
-    end = clock();
-    searchTime[RBTT] = (float)(end - begin);      // Stops the RBT search timer
+    cronStop(&cronRBT);
+    searchTime[RBTT] = cronRBT.millisec;      // Stops the RBT search timer
 
 
     
