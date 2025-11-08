@@ -10,30 +10,72 @@ BST bstNew() {
     return (BST){NULL, 0};
 }
 
-static NodeBST* bstInsertNode(NodeBST* node, Game game) {
+// static NodeBST* bstInsertNode(NodeBST* node, Game game) {
 
-    if (node == NULL) {
-        node = (NodeBST*) malloc(sizeof(NodeBST));
-        node->game = game;
-        node->left = NULL;
-        node->right = NULL;
-    }
+//     if (node == NULL) {
+//         node = (NodeBST*) malloc(sizeof(NodeBST));
+//         node->game = game;
+//         node->left = NULL;
+//         node->right = NULL;
+//     }
 
-    else if (strcompare(node->game.name, game.name) > 0) {
-        node->left = bstInsertNode(node->left, game);
-    }
-    else {
-        node->right = bstInsertNode(node->right, game);
-    }
+//     else if (strcompare(node->game.name, game.name) > 0) {
+//         node->left = bstInsertNode(node->left, game);
+//     }
+//     else {
+//         node->right = bstInsertNode(node->right, game);
+//     }
 
-    return node;
-}
+//     return node;
+// }
+
+// bool bstInsert(BST* tree, Game game) {
+
+//     if (tree == NULL) return false;
+//     tree->root = bstInsertNode(tree->root, game);
+//     return tree->root ? true : false;
+// }
 
 bool bstInsert(BST* tree, Game game) {
 
     if (tree == NULL) return false;
-    tree->root = bstInsertNode(tree->root, game);
-    return tree->root ? true : false;
+
+    NodeBST* newNode = (NodeBST*) malloc(sizeof(NodeBST));
+    newNode->game = game;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    
+    if (tree->root == NULL) {
+        tree->root = newNode;
+        return true;
+    }
+        
+    NodeBST* aux = tree->root;
+    NodeBST* father;
+    bool isRightSon;
+    
+    while (aux != NULL) {   // Searching the newNode's spot
+
+        if (strcompare(aux->game.name, game.name) < 0) {
+            father = aux;
+            aux = aux->right;
+            isRightSon = true;
+        }
+        else if(strcompare(aux->game.name, game.name) > 0) {
+            father = aux;
+            aux = aux->left;
+            isRightSon = false;
+        }
+        else {
+            printf("\nErro, nodo já existente!\n");
+            return false;
+        }
+    }
+
+    if (!isRightSon) father->left = newNode;
+    if (isRightSon) father->right = newNode;
+
+    return true;
 }
 
 static int bstCountNodesRecur(NodeBST* a) {

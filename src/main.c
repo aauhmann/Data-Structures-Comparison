@@ -50,13 +50,13 @@ int main(int argc, char* argv[]) {
     }
 
 
-    // BST TREE
-    generationTime[BSTT] = TimeGamesDataToTree(steamGamesFile, &bst, BSTT);
+    // // BST TREE
+    // generationTime[BSTT] = TimeGamesDataToTree(steamGamesFile, &bst, BSTT);
     
-    searchTime[BSTT] = TimedGameTreeSearch(desiredGamesFile, &bst, BSTT, &estimatedTime[BSTT]);
+    // searchTime[BSTT] = TimedGameTreeSearch(desiredGamesFile, &bst, BSTT, &estimatedTime[BSTT]);
 
-    rewind(steamGamesFile);
-    rewind(desiredGamesFile);
+    // rewind(steamGamesFile);
+    // rewind(desiredGamesFile);
 
     // AVL TREE
     generationTime[AVLT] = TimeGamesDataToTree(steamGamesFile, &avl, AVLT);
@@ -69,7 +69,15 @@ int main(int argc, char* argv[]) {
     // RBT TREE
     generationTime[RBTT] = TimeGamesDataToTree(steamGamesFile, &rbt, RBTT);
 
-    searchTime[RBTT] = TimedGameTreeSearch(desiredGamesFile, &rbt, RBTT, &estimatedTime[RBTT]);  
+    searchTime[RBTT] = TimedGameTreeSearch(desiredGamesFile, &rbt, RBTT, &estimatedTime[RBTT]); 
+    
+    rewind(steamGamesFile);
+    rewind(desiredGamesFile);
+     // BST TREE
+    generationTime[BSTT] = TimeGamesDataToTree(steamGamesFile, &bst, BSTT);
+    
+    searchTime[BSTT] = TimedGameTreeSearch(desiredGamesFile, &bst, BSTT, &estimatedTime[BSTT]);
+    
      
 
     printResults(estimatedTime, generationTime, searchTime, bst, avl, rbt);
@@ -168,20 +176,24 @@ float TimedGameTreeSearch(FILE* desiredGamesFile, void* tree, Trees type, float*
         if (desiredGame != NULL) {  // Game was found in the dataset
             
             switch (type) {
-                case BSTT:
+                case BSTT: {
                     NodeBST* aux = (NodeBST*)desiredGame;
                     *estimatedTime += aux->game.time;
                     break;
-                case AVLT:
+                }
+                case AVLT: {
                     NodeAVL* aux2 = (NodeAVL*)desiredGame;
                     *estimatedTime += aux2->key.time;
                     break;
-                case RBTT:
+                }
+                case RBTT: {
                     NodeRBT* aux3 = (NodeRBT*)desiredGame;
                     *estimatedTime += aux3->key.time;
                     break;
-                case SPLAYT:
-                    break;    
+                }
+                case SPLAYT: {
+                    break;
+                }
             }
 
         } 

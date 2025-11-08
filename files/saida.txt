@@ -22,5 +22,5 @@ Altura: 15
 Num rotacoes: 2234
 Comparacoes: 2162
 Tempo estimado: 2684.73 h
-Tempo de criacao: 6.00 ms
+Tempo de criacao: 5.00 ms
 Tempo de busca: 0.00 ms
