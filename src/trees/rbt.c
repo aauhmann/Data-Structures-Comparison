@@ -1,5 +1,4 @@
 #include "rbt.h"
-#include "global.h"
 #include "strcompare.h"
 #include <stdlib.h>
 
@@ -313,18 +312,18 @@ bool rbtInsert(RBT* tree, Game game) {
     newNode->color = RED;      // Inserting red node
     NodeRBT* aux = tree->root;
     NodeRBT* father;
-    Direction lastDirection;
+    bool isRightSon;
     while (aux != NULL) {   // Searching the newNode's spot
 
         if (strcompare(aux->key.name, game.name) < 0) {
             father = aux;
             aux = aux->right;
-            lastDirection = RIGHT;
+            isRightSon = true;
         }
         else if(strcompare(aux->key.name, game.name) > 0) {
             father = aux;
             aux = aux->left;
-            lastDirection = LEFT;
+            isRightSon = false;
         }
         else {
             printf("\nErro, nodo já existente!\n");
@@ -332,8 +331,8 @@ bool rbtInsert(RBT* tree, Game game) {
         }
     }
 
-    if (lastDirection == LEFT) father->left = newNode;
-    if (lastDirection == RIGHT) father->right = newNode;
+    if (!isRightSon) father->left = newNode;
+    if (isRightSon) father->right = newNode;
     newNode->parent = father;
 
     return rbtBalance(tree, newNode);

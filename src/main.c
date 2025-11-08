@@ -1,5 +1,4 @@
 #include "trees.h"
-#include "global.h"
 #include <string.h>
 #include <stdlib.h>
 #include "cronometer.h"

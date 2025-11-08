@@ -1,6 +1,5 @@
 #include "avl.h"
 #include "strcompare.h"
-#include "global.h"
 #include <stdlib.h>
 
 bool avlNodeFixFactor(NodeAVL* node);

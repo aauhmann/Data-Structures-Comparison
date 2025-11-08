@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "strcompare.h"
-#include "global.h"
 #include <string.h>
 
 #include <ctype.h>
