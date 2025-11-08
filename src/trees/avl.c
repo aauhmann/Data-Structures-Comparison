@@ -19,7 +19,7 @@ void avlSubtreeDoubleRotateLeft(AVL* tree, NodeAVL* root);
 int avlNodeFactor(NodeAVL* node);
 
 AVL avlInitialize() {
-    return (AVL){NULL, 0};
+    return (AVL){NULL, 0, 0};
 }
 
 bool avlEmpty(AVL tree) {
@@ -222,7 +222,7 @@ void avlClear(AVL* tree) {
         // printf("\nTree cleared");
     }
 
-    rotations[AVLT] = 0;
+    tree->numRotations = 0;
 }
 
 void avlSubtreeRotate(AVL* tree, NodeAVL* root) {
@@ -256,7 +256,7 @@ void avlSubtreeRotateRight(AVL* tree, NodeAVL* root) {
     NodeAVL* aux = root->left;
     NodeAVL* parent = root->parent;
 
-    rotations[AVLT]++;
+    tree->numRotations++;
 
     if (root == tree->root)
         tree->root = aux;
@@ -285,7 +285,7 @@ void avlSubtreeRotateLeft(AVL* tree, NodeAVL* root) {
     NodeAVL* aux = root->right;
     NodeAVL* parent = root->parent;
 
-    rotations[AVLT]++;
+    tree->numRotations++;
 
     if (root == tree->root)
         tree->root = aux;
@@ -315,7 +315,7 @@ void avlSubtreeDoubleRotateRight(AVL* tree, NodeAVL* root) {
     NodeAVL* auxR = auxL->right;
     NodeAVL* parent = root->parent;
 
-    rotations[AVLT] += 2;
+    tree->numRotations += 2;
 
     if (root == tree->root)
         tree->root = auxR;
@@ -356,7 +356,7 @@ void avlSubtreeDoubleRotateLeft(AVL* tree, NodeAVL* root) {
     NodeAVL* auxL = auxR->left;
     NodeAVL* parent = root->parent;
 
-    rotations[AVLT] += 2;
+    tree->numRotations += 2;
 
     if (root == tree->root)
         tree->root = auxL;
@@ -429,29 +429,35 @@ void avlPrintResults(AVL tree) {
     printf("\n\n----- AVL -----");
     printf("\nNum nodos: %d", avlCountNodes(tree));
     printf("\nAltura: %d", tree.height);
-    printf("\nNum rotacoes: %d", rotations[AVLT]);
-    printf("\nComparacoes: %d", comp[AVLT]);
+    printf("\nNum rotacoes: %d", tree.numRotations);
+    printf("\nComparacoes: %d", tree.totalComparisons);
 }
 
 void avlFilePrintResults(AVL tree, FILE* file) {
     fprintf(file, "\n\n----- AVL -----");
     fprintf(file, "\nNum nodos: %d", avlCountNodes(tree));
     fprintf(file, "\nAltura: %d", tree.height);
-    fprintf(file, "\nNum rotacoes: %d", rotations[AVLT]);
-    fprintf(file, "\nComparacoes: %d", comp[AVLT]);
+    fprintf(file, "\nNum rotacoes: %d", tree.numRotations);
+    fprintf(file, "\nComparacoes: %d", tree.totalComparisons);
 }
 
-NodeAVL* avlConsulta(NodeAVL *a, char *chave) {
-    while (a != NULL){
-        comp[AVLT]++;
-        if (!strcompare(a->key.name, chave)){
-            return a;
-        } else {
-            if (strcompare(a->key.name, chave) > 0)
-                a = a->left;
+NodeAVL* avlSearch(AVL* tree, char* key) {
+
+    NodeAVL* aux = tree->root;
+
+    while (aux != NULL){
+
+        tree->totalComparisons++;
+
+        if (!strcompare(aux->key.name, key))
+            return aux;
+        else {
+            if (strcompare(aux->key.name, key) > 0)
+                aux = aux->left;
             else
-                a = a->right;
+                aux = aux->right;
         }
+
     }
     return NULL;
 }

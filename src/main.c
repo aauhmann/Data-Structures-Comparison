@@ -1,9 +1,5 @@
-#include "strcompare.h"
-#include "bst.h"
-#include "avl.h"
-#include "rbt.h"
+#include "trees.h"
 #include "global.h"
-#include <time.h>
 #include <string.h>
 #include <stdlib.h>
 #include "cronometer.h"
@@ -15,12 +11,9 @@
 
 void printResults(float* estimatedTime, float* creationTime, float* searchTime, BST bst, AVL avl, RBT rbt);
 void fprintResults(FILE* file, float* estimatedTime, float* creationTime, float* searchTime, BST bst, AVL avl, RBT rbt);
-
-/// a files\teste.csv files\lista_teste.txt files\saida.txt
-/// a files\dataset.csv files\lista_jogador1.txt files\saida.txt
-
-int comp[4] = {0, 0, 0, 0};
-int rotations[4] = {0, 0, 0, 0};
+typedef bool (*TreeInsertFunction)(void* tree, Game game);
+float TimeGamesDataToTree(FILE* file, void* tree, Trees type);
+float TimedGameTreeSearch(FILE* desiredGamesFile, void* tree, Trees type, float* estimatedTime);
 
 int main(int argc, char* argv[]) {
     
@@ -34,18 +27,9 @@ int main(int argc, char* argv[]) {
     AVL avl = avlInitialize();
     RBT rbt = rbtNew();
 
-    Cronometer cronBST = cronNew();
-    Cronometer cronAVL = cronNew();
-    Cronometer cronRBT = cronNew();
-    //Cronometer cronSPT = cronNew();
-
-
-
-    char line[1000];
     float generationTime[4];
     float searchTime[4];
     float estimatedTime[4] = {0, 0, 0, 0};
-    Game game = {NULL, 0};
 
     FILE* steamGamesFile = fopen(STEAM_GAMES, "r");
     FILE* desiredGamesFile = fopen(DESIRED_GAMES, "r");
@@ -67,146 +51,27 @@ int main(int argc, char* argv[]) {
     }
 
 
-
-
-
     // BST TREE
-    cronStart(&cronBST);
-
-    // Dataset loop
-    while (fgets(line, sizeof(line), steamGamesFile)) {
-        char *word = strtok(line, DELIMITERS);      // Gets the game's name(first word)
-
-        game.name = (char*)malloc(strlen(word) + 1);
-        
-        strncpy(game.name, word, strlen(word) + 1);
-        
-        game.time = atof(strtok(NULL, DELIMITERS));     // Gets the average gameplay time(second word)
-
-        bstInsert(&bst, game);      // Inserts into the tree       
-    }
-
-    cronStop(&cronBST);
-    generationTime[BSTT] = cronBST.millisec;
+    generationTime[BSTT] = TimeGamesDataToTree(steamGamesFile, &bst, BSTT);
     
-    // Search loop
-    cronStart(&cronBST);     // Starts the BST search timer
+    searchTime[BSTT] = TimedGameTreeSearch(desiredGamesFile, &bst, BSTT, &estimatedTime[BSTT]);
 
-    while (fgets(line, sizeof(line), desiredGamesFile)) {
-        // char* word = strtok(line, DELIMITERS);
-        // printf("\n%s", word);
-        //NodeBST* desiredGame = bstSearch(bst.root, strtok(line, DELIMITERS));    // Gets desired game's name
-        NodeBST* desiredGame = bstSearch(bst.root, strtok(line, DELIMITERS));
-        if (desiredGame != NULL) { 
-            //printf("\t esta no arquivo");
-            //estimatedTime += desiredGame->game.time;
-            estimatedTime[BSTT] += desiredGame->game.time;
-        }
-        //else printf("NAO ACHOU");
-    }
-
-    cronStop(&cronBST);      // Stops the BST search timer
-    searchTime[BSTT] = cronBST.millisec;
-
-
-
-
+    rewind(steamGamesFile);
+    rewind(desiredGamesFile);
 
     // AVL TREE
+    generationTime[AVLT] = TimeGamesDataToTree(steamGamesFile, &avl, AVLT);
+
+    searchTime[AVLT] = TimedGameTreeSearch(desiredGamesFile, &avl, AVLT, &estimatedTime[AVLT]);    
+
     rewind(steamGamesFile);
     rewind(desiredGamesFile);
-
-    // Dataset loop
-    cronStart(&cronAVL);       // Starts the AVL tree generation timer
-
-    while (fgets(line, sizeof(line), steamGamesFile)) {
-        char *word = strtok(line, DELIMITERS);      // Gets the game's name(first word)
-
-        game.name = (char*)malloc(strlen(word) + 1);
-        
-        strncpy(game.name, word, strlen(word) + 1);
-        
-        game.time = atof(strtok(NULL, DELIMITERS));     // Gets the average gameplay time(second word)
-
-        avlInsert(&avl, game);      // Inserts into the tree
-        
-        // avlPrint(avl);
-        // printf("\n");
-    }
-
-    cronStop(&cronAVL);      // Stops the AVL tree generation timer
-    generationTime[AVLT] = cronAVL.millisec;
-
-    // Search loop
-    cronStart(&cronAVL);
-
-    while (fgets(line, sizeof(line), desiredGamesFile)) {
-        // char* word = strtok(line, DELIMITERS);
-        // printf("\n%s", word);
-        //NodeBST* desiredGame = bstSearch(bst.root, strtok(line, DELIMITERS));    // Gets desired game's name
-        NodeAVL* desiredGame = avlConsulta(avl.root, strtok(line, DELIMITERS));
-        if (desiredGame != NULL) { 
-            //printf("\t esta no arquivo");
-            //estimatedTime += desiredGame->game.time;
-            estimatedTime[AVLT] += desiredGame->key.time;
-        }
-        //else printf("NAO ACHOU");
-    }
-
-    cronStop(&cronAVL);
-    searchTime[AVLT] = cronAVL.millisec;      // Stops the AVL search timer
-
-
-
-
-
 
     // RBT TREE
-    rewind(steamGamesFile);
-    rewind(desiredGamesFile);
+    generationTime[RBTT] = TimeGamesDataToTree(steamGamesFile, &rbt, RBTT);
 
-    // Dataset loop
-    cronStart(&cronRBT);      // Starts the RBT tree generation timer
-
-    while (fgets(line, sizeof(line), steamGamesFile)) {
-        char *word = strtok(line, DELIMITERS);      // Gets the game's name(first word)
-
-        game.name = (char*)malloc(strlen(word) + 1);
-        
-        strncpy(game.name, word, strlen(word) + 1);
-        
-        game.time = atof(strtok(NULL, DELIMITERS));     // Gets the average gameplay time(second word)
-
-        // printf("\n\n");
-        rbtInsert(&rbt, game);      // Inserts into the tree    
-        // rbPrint(rbt);  
-    }
-
-    cronStop(&cronRBT);      // Stops the AVL tree generation timer
-    generationTime[RBTT] = cronRBT.millisec;
-
-    // Search loop
-    cronStart(&cronRBT);
-
-    while (fgets(line, sizeof(line), desiredGamesFile)) {
-        // char* word = strtok(line, DELIMITERS);
-        // printf("\n%s", word);
-        //NodeBST* desiredGame = bstConsulta(bst.root, strtok(line, DELIMITERS));    // Gets desired game's name
-        NodeRBT* desiredGame = rbtSearch(rbt.root, strtok(line, DELIMITERS));
-        if (desiredGame != NULL) { 
-            //printf("\t esta no arquivo");
-            //estimatedTime += desiredGame->game.time;
-            estimatedTime[RBTT] += desiredGame->key.time;
-        }
-        //else printf("NAO ACHOU");
-    }
-
-    cronStop(&cronRBT);
-    searchTime[RBTT] = cronRBT.millisec;      // Stops the RBT search timer
-
-
-    
-
+    searchTime[RBTT] = TimedGameTreeSearch(desiredGamesFile, &rbt, RBTT, &estimatedTime[RBTT]);  
+     
 
     printResults(estimatedTime, generationTime, searchTime, bst, avl, rbt);
     fprintResults(outputFile, estimatedTime, generationTime, searchTime, bst, avl, rbt);
@@ -265,4 +130,62 @@ void fprintResults(FILE* file, float* estimatedTime, float* generationTime, floa
     // fprintf(file, "\nTempo de criacao (SPLAY): %.2f ms", generationTime[SPLAYT]);
     // fprintf(file, "\nTempo de busca (SPLAY): %.2f ms", searchTime[SPLAYT]);
 
+}
+
+float TimeGamesDataToTree(FILE* file, void* tree, Trees type) {
+
+    Cronometer insertionCron = cronNew();
+    char line[1000];
+
+    // Dataset loop
+    while (fgets(line, sizeof(line), file)) {
+        char *word = strtok(line, DELIMITERS);      // Gets the game's name(first word)
+
+        Game game = { (char*)malloc(strlen(word) + 1), atof(strtok(NULL, DELIMITERS)) }; // Allocs name's memmory and gets the average gameplay time(second word)
+
+        strncpy(game.name, word, strlen(word) + 1);  // Puts the game's name into the struct
+
+        cronStart(&insertionCron);
+        treeInsert(tree, game, type);      // Inserts into the tree   
+        cronStop(&insertionCron);    
+    }
+
+    return insertionCron.millisec;
+}
+
+float TimedGameTreeSearch(FILE* desiredGamesFile, void* tree, Trees type, float* estimatedTime) {
+
+    Cronometer searchCron = cronNew();
+    char line[1000];
+    *estimatedTime = 0;
+    
+    // Search loop
+    while (fgets(line, sizeof(line), desiredGamesFile)) {   
+       
+        cronStart(&searchCron);
+        void* desiredGame = treeSearch(tree, strtok(line, DELIMITERS), type);   // Gets desired game's name and search it on the tree
+        cronStop(&searchCron);
+
+        if (desiredGame != NULL) {  // Game was found in the dataset
+            
+            switch (type) {
+                case BSTT:
+                    NodeBST* aux = (NodeBST*)desiredGame;
+                    *estimatedTime += aux->game.time;
+                    break;
+                case AVLT:
+                    NodeAVL* aux2 = (NodeAVL*)desiredGame;
+                    *estimatedTime += aux2->key.time;
+                    break;
+                case RBTT:
+                    NodeRBT* aux3 = (NodeRBT*)desiredGame;
+                    *estimatedTime += aux3->key.time;
+                    break;
+                case SPLAYT:
+                    break;    
+            }
+
+        } 
+    }
+    return searchCron.millisec;
 }

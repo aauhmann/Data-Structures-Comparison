@@ -9,7 +9,8 @@ typedef struct nodeBST {
 } NodeBST;
 
 typedef struct {
-    NodeBST* root; 
+    NodeBST* root;
+    int totalComparisons; 
 } BST;
 
 /// @brief Creates a new BST
@@ -20,7 +21,7 @@ BST bstNew();
 /// @param tree 
 /// @param game 
 /// @return 0 == ERROR, 1 == SUCCESS
-int bstInsert(BST* tree, Game game);
+bool bstInsert(BST* tree, Game game);
 
 /// @brief Counts the number of nodes from a BST
 /// @param tree 
@@ -52,4 +53,4 @@ void bstPrintResults(BST tree);
 void bstFilePrintResults(BST tree, FILE* file);
 
 //FUNÇÃO VIVIANE
-NodeBST* bstSearch(NodeBST* root, char* key);
+NodeBST* bstSearch(BST* tree, char* key);

@@ -10,3 +10,4 @@ typedef struct {
 Cronometer cronNew();
 void cronStart(Cronometer* cron);
 void cronStop(Cronometer* cron);
+void cronReset(Cronometer* cron);

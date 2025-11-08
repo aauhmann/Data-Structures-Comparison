@@ -18,6 +18,8 @@ typedef struct NodeAVL {
 typedef struct AVL {
     NodeAVL* root;
     int height;
+    int totalComparisons;
+    int numRotations;
 } AVL;
 
 typedef void (*NodeFunctionAVL)(NodeAVL*);
@@ -36,4 +38,4 @@ void avlFactor(NodeAVL* root, int* factor);
 void avlPrintResults(AVL tree);
 void avlFilePrintResults(AVL tree, FILE* file);
 int avlCountNodes(AVL tree);
-NodeAVL* avlConsulta(NodeAVL *a, char *chave);
+NodeAVL* avlSearch(AVL* tree, char* key);

@@ -18,6 +18,8 @@ typedef struct nodeRBT {
 
 typedef struct {
     NodeRBT* root;
+    int totalComparisons;
+    int numRotations;
 } RBT;
 
 /// @brief Creates a new RBT
@@ -60,4 +62,4 @@ void rbtPrintResults(RBT tree);
 void rbtFilePrintResults(RBT tree, FILE* file);
 
 //FUNÇÃO VIVIANE
-NodeRBT* rbtSearch(NodeRBT* root, char* key);
+NodeRBT* rbtSearch(RBT* tree, char* key);

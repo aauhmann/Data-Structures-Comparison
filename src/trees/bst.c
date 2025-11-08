@@ -8,7 +8,7 @@
 #include <ctype.h>
 
 BST bstNew() {
-    return (BST){NULL};
+    return (BST){NULL, 0};
 }
 
 static NodeBST* bstInsertNode(NodeBST* node, Game game) {
@@ -30,11 +30,11 @@ static NodeBST* bstInsertNode(NodeBST* node, Game game) {
     return node;
 }
 
-int bstInsert(BST* tree, Game game) {
+bool bstInsert(BST* tree, Game game) {
 
-    if (tree == NULL) return 0;
+    if (tree == NULL) return false;
     tree->root = bstInsertNode(tree->root, game);
-    return tree->root ? 1 : 0;
+    return tree->root ? true : false;
 }
 
 static int bstCountNodesRecur(NodeBST* a) {
@@ -120,7 +120,7 @@ void bstPrintResults(BST tree) {
     printf("\nNum nodos: %d", numNodes);
     printf("\nAltura: %d", height);
     printf("\nNum rotacoes: %d", numRotations);
-    printf("\nComparacoes: %d", comp[BSTT]);
+    printf("\nComparacoes: %d", tree.totalComparisons);
 }
 
 void bstFilePrintResults(BST tree, FILE* file) {
@@ -133,22 +133,26 @@ void bstFilePrintResults(BST tree, FILE* file) {
     fprintf(file, "\nNum nodos: %d", numNodes);
     fprintf(file, "\nAltura: %d", height);
     fprintf(file, "\nNum rotacoes: %d", numRotations);
-    fprintf(file, "\nComparacoes: %d", comp[BSTT]);
+    fprintf(file, "\nComparacoes: %d", tree.totalComparisons);
 }
 
-NodeBST* bstSearch(NodeBST* root, char* key) {
-    while (root != NULL){
-        comp[BSTT]++;
-        if (!strcompare(root->game.name, key)){
-            return root;
-        } else {
-            if (strcompare(root->game.name, key) > 0)
-                root = root->left;
+NodeBST* bstSearch(BST* tree, char* key) {
+
+    NodeBST* aux = tree->root;
+
+    while (aux != NULL){
+
+        tree->totalComparisons++;
+
+        if (!strcompare(aux->game.name, key))
+             return aux;
+        else {
+            if (strcompare(aux->game.name, key) > 0)
+                aux = aux->left;
             else
-                root = root->right;
+                aux = aux->right;
         }
     }
- return NULL;
+
+    return NULL;
 }
-
-

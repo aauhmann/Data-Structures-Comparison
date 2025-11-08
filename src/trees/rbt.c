@@ -4,14 +4,14 @@
 #include <stdlib.h>
 
 RBT rbtNew() {
-    return (RBT){NULL};
+    return (RBT){NULL, 0};
 }
 
 static void rbSubtreeRotateRight(RBT* tree, NodeRBT* root) {
     NodeRBT* aux = root->left;
     NodeRBT* parent = root->parent;
 
-    rotations[RBTT]++;
+    tree->numRotations++;
 
     if (root == tree->root)
         tree->root = aux;
@@ -33,7 +33,7 @@ static void rbSubtreeRotateLeft(RBT* tree, NodeRBT* root) {
     NodeRBT* aux = root->right;
     NodeRBT* parent = root->parent;
 
-    rotations[RBTT]++;
+    tree->numRotations++;
 
     if (root == tree->root)
         tree->root = aux;
@@ -56,7 +56,7 @@ static void rbSubtreeDoubleRotateRight(RBT* tree, NodeRBT* root) {
     NodeRBT* auxR = auxL->right;
     NodeRBT* parent = root->parent;
 
-    rotations[RBTT] += 2;
+    tree->numRotations += 2;
 
     if (root == tree->root)
         tree->root = auxR;
@@ -84,7 +84,7 @@ static void rbSubtreeDoubleRotateLeft(RBT* tree, NodeRBT* root) {
     NodeRBT* auxL = auxR->left;
     NodeRBT* parent = root->parent;
 
-    rotations[RBTT] += 2;
+    tree->numRotations += 2;
     
     if (root == tree->root)
         tree->root = auxL;
@@ -164,28 +164,33 @@ void rbtPrintResults(RBT tree) {
     printf("\n\n----- RBT -----");
     printf("\nNum nodos: %d", rbtCountNodes(tree));
     printf("\nAltura: %d", rbtHeight(tree));
-    printf("\nNum rotacoes: %d", rotations[RBTT]);
-    printf("\nComparacoes: %d", comp[RBTT]);
+    printf("\nNum rotacoes: %d", tree.numRotations);
+    printf("\nComparacoes: %d", tree.totalComparisons);
 }
 
 void rbtFilePrintResults(RBT tree, FILE* file) {
     fprintf(file, "\n\n----- RBT -----");
     fprintf(file, "\nNum nodos: %d", rbtCountNodes(tree));
     fprintf(file, "\nAltura: %d", rbtHeight(tree));
-    fprintf(file, "\nNum rotacoes: %d", rotations[RBTT]);
-    fprintf(file, "\nComparacoes: %d", comp[RBTT]);
+    fprintf(file, "\nNum rotacoes: %d", tree.numRotations);
+    fprintf(file, "\nComparacoes: %d", tree.totalComparisons);
 }
 
-NodeRBT* rbtSearch(NodeRBT* root, char* key) {
-    while (root != NULL){
-        comp[RBTT]++;
-        if (!strcompare(root->key.name, key)){
-            return root;
-        } else {
-            if (strcompare(root->key.name, key) > 0)
-                root = root->left;
+NodeRBT* rbtSearch(RBT* tree, char* key) {
+
+    NodeRBT* aux = tree->root;
+
+    while (aux != NULL){
+
+        tree->totalComparisons++;
+
+        if (!strcompare(aux->key.name, key))
+            return aux;
+        else {
+            if (strcompare(aux->key.name, key) > 0)
+                aux = aux->left;
             else
-                root = root->right;
+                aux = aux->right;
         }
     }
     return NULL;
