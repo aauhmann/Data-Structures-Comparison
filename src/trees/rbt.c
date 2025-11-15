@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 RBT rbtNew() {
-    return (RBT){NULL, 0};
+    return (RBT){NULL, 0, 0};
 }
 
 static void rbSubtreeRotateRight(RBT* tree, NodeRBT* root) {
@@ -168,7 +168,7 @@ void rbtPrintResults(RBT tree) {
 }
 
 void rbtFilePrintResults(RBT tree, FILE* file) {
-    fprintf(file, "\n\n----- RBT -----");
+    fprintf(file, "\n\n----- RUBRO-NEGRA -----");
     fprintf(file, "\nNum nodos: %d", rbtCountNodes(tree));
     fprintf(file, "\nAltura: %d", rbtHeight(tree));
     fprintf(file, "\nNum rotacoes: %d", tree.numRotations);

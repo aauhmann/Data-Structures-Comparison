@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 SPT sptNew() {
-    return (SPT){NULL}; // Returns an empty splay tree
+    return (SPT){NULL, 0, 0}; // Returns an empty splay tree with zeroed rotations and comparisons counters
 }
 
 static bool sptEmpty(SPT tree) {
@@ -57,15 +57,15 @@ static void sptSplaying(NodeSPT* aux, NodeSPT* node, NodeSPT* father) {
 }
 
 static void sptSplit(SPT* tree, SPT auxTrees[]) {
-    auxTrees[0] = (SPT){tree->root, 0};
-    auxTrees[1] = (SPT){tree->root->right, 0};
+    auxTrees[0] = (SPT){tree->root, tree->numRotations, tree->totalComparisons};
+    auxTrees[1] = (SPT){tree->root->right, 0, 0};
 
     // Cuts the connection between the new trees
     auxTrees[0].root->right = NULL;
 }
 
 static SPT sptJoin(SPT auxTrees[], NodeSPT* root) {
-    SPT tree = (SPT){root, 0};
+    SPT tree = (SPT){root, auxTrees[0].numRotations, auxTrees[0].totalComparisons};
 
     if (root != NULL)
         // Connects right tree to the new root
@@ -79,14 +79,15 @@ static SPT sptJoin(SPT auxTrees[], NodeSPT* root) {
 static NodeSPT* sptAccessSearch(NodeSPT* node, NodeSPT* father, char* key, int* rotations, int* comparisons) {
     if (node == NULL) // Node with data not found
         return father;
-    
+        
+    if (comparisons != NULL) // Just increments 'comparisons' when sptAccessSearch is called by sptSearch
+        (*comparisons)++;
+
     if (strcompare(key, node->data.name) == 0) // Node with data found
         return node;
     
     NodeSPT* aux;
 
-    if (comparisons != NULL) // Just increments 'comparisons' when sptAccessSearch is called by sptSearch
-        (*comparisons)++;
 
     if (strcompare(key, node->data.name) < 0) 
         aux = sptAccessSearch(node->left, node, key, rotations, comparisons);
@@ -226,7 +227,7 @@ void sptNodeDelete(SPT* tree, type data) {
         return;
     }
 
-    NodeSPT* aux = sptSearch(tree, data.name); // The to be deleted node
+    NodeSPT* aux = sptSearch(tree, data.name); // The 'soon to be' deleted node
     
     // Ends function in case the accessed node isn't the one with the desired data
     if (strcompare(data.name, aux->data.name) != 0)

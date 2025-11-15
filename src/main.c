@@ -1,7 +1,7 @@
 #include "trees.h"
+#include "cronometer.h"
 #include <string.h>
 #include <stdlib.h>
-#include "cronometer.h"
 
 #define DELIMITERS ",\n"
 #define STEAM_GAMES argv[1]
@@ -56,7 +56,6 @@ int main(int argc, char* argv[]) {
     
     // BST TREE
     generationTime[BSTT] = TimedGamesDataToTree(steamGamesFile, &bst, BSTT);
-    
     searchTime[BSTT] = TimedGameTreeSearch(desiredGamesFile, &bst, BSTT, &estimatedTime[BSTT]);
     
     rewind(steamGamesFile);
@@ -64,7 +63,6 @@ int main(int argc, char* argv[]) {
     
     // AVL TREE
     generationTime[AVLT] = TimedGamesDataToTree(steamGamesFile, &avl, AVLT);
-
     searchTime[AVLT] = TimedGameTreeSearch(desiredGamesFile, &avl, AVLT, &estimatedTime[AVLT]);    
 
     rewind(steamGamesFile);
@@ -72,14 +70,13 @@ int main(int argc, char* argv[]) {
 
     // RB TREE
     generationTime[RBTT] = TimedGamesDataToTree(steamGamesFile, &rbt, RBTT);
-    
     searchTime[RBTT] = TimedGameTreeSearch(desiredGamesFile, &rbt, RBTT, &estimatedTime[RBTT]);
     
     rewind(steamGamesFile);
     rewind(desiredGamesFile);
-     // SPLAY TREE
+
+    // SPLAY TREE
     generationTime[SPLAYT] = TimedGamesDataToTree(steamGamesFile, &spt, SPLAYT);
-    
     searchTime[SPLAYT] = TimedGameTreeSearch(desiredGamesFile, &spt, SPLAYT, &estimatedTime[SPLAYT]);
     
     

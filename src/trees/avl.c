@@ -18,7 +18,7 @@ void avlSubtreeDoubleRotateLeft(AVL* tree, NodeAVL* root);
 int avlNodeFactor(NodeAVL* node);
 
 AVL avlInitialize() {
-    return (AVL){NULL, 0, 0};
+    return (AVL){NULL, 0, 0, 0};
 }
 
 bool avlEmpty(AVL tree) {
