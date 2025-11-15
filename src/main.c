@@ -26,6 +26,7 @@ int main(int argc, char* argv[]) {
     BST bst = bstNew();
     AVL avl = avlInitialize();
     RBT rbt = rbtNew();
+    SPT spt = sptNew();
 
     float generationTime[NUM_TREES];
     float searchTime[NUM_TREES];
@@ -54,7 +55,7 @@ int main(int argc, char* argv[]) {
     
     
     // BST TREE
-    generationTime[BSTT] = TimeGamesDataToTree(steamGamesFile, &bst, BSTT);
+    generationTime[BSTT] = TimedGamesDataToTree(steamGamesFile, &bst, BSTT);
     
     searchTime[BSTT] = TimedGameTreeSearch(desiredGamesFile, &bst, BSTT, &estimatedTime[BSTT]);
     
@@ -62,35 +63,18 @@ int main(int argc, char* argv[]) {
     rewind(desiredGamesFile);
     
     // AVL TREE
-    // generationTime[AVLT] = TimedGamesDataToTree(steamGamesFile, &avl, AVLT);
+    generationTime[AVLT] = TimedGamesDataToTree(steamGamesFile, &avl, AVLT);
 
-    // searchTime[AVLT] = TimedGameTreeSearch(desiredGamesFile, &avl, AVLT, &estimatedTime[AVLT]);    
+    searchTime[AVLT] = TimedGameTreeSearch(desiredGamesFile, &avl, AVLT, &estimatedTime[AVLT]);    
 
-    // rewind(steamGamesFile);
-    // rewind(desiredGamesFile);
+    rewind(steamGamesFile);
+    rewind(desiredGamesFile);
 
     // RB TREE
     generationTime[RBTT] = TimedGamesDataToTree(steamGamesFile, &rbt, RBTT);
-
-    generationTime[AVLT] = TimeGamesDataToTree(steamGamesFile, &avl, AVLT);
     
-    searchTime[AVLT] = TimedGameTreeSearch(desiredGamesFile, &avl, AVLT, &estimatedTime[AVLT]);    
+    searchTime[RBTT] = TimedGameTreeSearch(desiredGamesFile, &rbt, RBTT, &estimatedTime[RBTT]);
     
-    rewind(steamGamesFile);
-    rewind(desiredGamesFile);
-    
-    // RBT TREE
-    generationTime[RBTT] = TimeGamesDataToTree(steamGamesFile, &rbt, RBTT);
-    
-    searchTime[RBTT] = TimedGameTreeSearch(desiredGamesFile, &rbt, RBTT, &estimatedTime[RBTT]); 
-    
-    rewind(steamGamesFile);
-    rewind(desiredGamesFile);
-    // BST TREE
-    generationTime[BSTT] = TimedGamesDataToTree(steamGamesFile, &bst, BSTT);
-    
-    searchTime[BSTT] = TimedGameTreeSearch(desiredGamesFile, &bst, BSTT, &estimatedTime[BSTT]);
-
     rewind(steamGamesFile);
     rewind(desiredGamesFile);
      // SPLAY TREE
@@ -98,17 +82,13 @@ int main(int argc, char* argv[]) {
     
     searchTime[SPLAYT] = TimedGameTreeSearch(desiredGamesFile, &spt, SPLAYT, &estimatedTime[SPLAYT]);
     
-     
-
+    
     printResults(estimatedTime, generationTime, searchTime, bst, avl, rbt, spt);
     fprintResults(outputFile, estimatedTime, generationTime, searchTime, bst, avl, rbt, spt);
-    
-    
-    printResults(estimatedTime, generationTime, searchTime, bst, avl, rbt);
-    fprintResults(outputFile, estimatedTime, generationTime, searchTime, bst, avl, rbt);
+
     
     bstClear(&bst);
-    // avlClear(&avl);
+    avlClear(&avl);
     rbtClear(&rbt);
     sptClear(&spt);
     
@@ -180,7 +160,10 @@ float TimedGamesDataToTree(FILE* file, void* tree, Trees type) {
 
         cronStart(&insertionCron);
         treeInsert(tree, game, type);      // Inserts into the tree   
-        cronStop(&insertionCron);    
+        cronStop(&insertionCron);
+
+        // if (type == SPLAYT)
+        //     sptPrint(*(SPT*)tree);
     }
 
     return insertionCron.millisec;
@@ -218,6 +201,8 @@ float TimedGameTreeSearch(FILE* desiredGamesFile, void* tree, Trees type, float*
                     break;
                 }
                 case SPLAYT: {
+                    NodeSPT* aux4 = (NodeSPT*)desiredGame;
+                    *estimatedTime += aux4->data.time;
                     break;
                 }
             }

@@ -1,6 +1,5 @@
 #include "splay.h"
 #include "strcompare.h"
-#include <stdio.h>
 #include <stdlib.h>
 
 SPT sptNew() {
@@ -77,19 +76,22 @@ static SPT sptJoin(SPT auxTrees[], NodeSPT* root) {
     return tree;
 }
 
-static NodeSPT* sptAccessSearch(NodeSPT* node, NodeSPT* father, type data, int* rotations) {
+static NodeSPT* sptAccessSearch(NodeSPT* node, NodeSPT* father, char* key, int* rotations, int* comparisons) {
     if (node == NULL) // Node with data not found
         return father;
     
-    if (strcompare(data.name, node->data.name) == 0) // Node with data found
+    if (strcompare(key, node->data.name) == 0) // Node with data found
         return node;
     
     NodeSPT* aux;
 
-    if (strcompare(data.name, node->data.name) < 0) 
-        aux = sptAccessSearch(node->left, node, data, rotations);
+    if (comparisons != NULL) // Just increments 'comparisons' when sptAccessSearch is called by sptSearch
+        (*comparisons)++;
+
+    if (strcompare(key, node->data.name) < 0) 
+        aux = sptAccessSearch(node->left, node, key, rotations, comparisons);
     else // If (data > node->data)
-        aux = sptAccessSearch(node->right, node, data, rotations);
+        aux = sptAccessSearch(node->right, node, key, rotations, comparisons);
 
     if (aux != node) {
         sptSplaying(aux, node, father);
@@ -99,21 +101,19 @@ static NodeSPT* sptAccessSearch(NodeSPT* node, NodeSPT* father, type data, int* 
     return aux;
 }
 
-NodeSPT* sptAccess(SPT* tree, type data) {
+NodeSPT* sptSearch(SPT* tree, char* key) {
     if (sptEmpty(*tree)) {
         // Checks if the splay tree is empty
         printf("\nEmpty splay tree");
         return NULL;
     }
 
-    NodeSPT* aux = sptAccessSearch(tree->root, NULL, data, &tree->numRotations);
+    NodeSPT* aux = sptAccessSearch(tree->root, NULL, key, &tree->numRotations, &tree->totalComparisons);
 
     tree->root = aux;
 
-    if (strcompare(data.name, aux->data.name) != 0) { // Node with data not found
-        printf("\ndata %d not in the tree", data);
+    if (strcompare(key, aux->data.name) != 0) // Node with data not found
         return NULL;
-    }
 
     // Node with the data is found
     return aux;
@@ -131,14 +131,12 @@ void sptInsert(SPT* tree, type data) {
         return;
     }
 
-    NodeSPT* aux = sptAccessSearch(tree->root, NULL, data, &tree->numRotations);
+    NodeSPT* aux = sptAccessSearch(tree->root, NULL, data.name, &tree->numRotations, NULL);
 
     tree->root = aux;
 
-    if (strcompare(data.name, aux->data.name) == 0) {
-        printf("\nNode with data %d already in tree", data);
+    if (strcompare(data.name, aux->data.name) == 0)
         return;
-    }
 
     SPT auxTrees[2]; // Array of the auxiliar trees
     sptSplit(tree, auxTrees);
@@ -189,7 +187,7 @@ void sptNodePrintDepth(SPT tree, type data) {
     int depth = sptNodeDepth(tree, data);
 
     if (depth == -1) {
-        printf("\ndata %d not in the tree", data);
+        printf("\nNode named %s not in the tree", data.name);
         return;
     }
 
@@ -213,11 +211,12 @@ void sptNodePrint(SPT tree, type data) {
     }
 
     if (aux == NULL) {
-        printf("\ndata %d not in the tree", data);
+        printf("\nNode named %s not in the tree", data.name);
         return;
     }
 
-    printf("data: %d", aux->data);
+    printf("Name: %s", aux->data.name);
+    printf("Time: %.2f", aux->data.time);
 }
 
 void sptNodeDelete(SPT* tree, type data) {
@@ -227,7 +226,7 @@ void sptNodeDelete(SPT* tree, type data) {
         return;
     }
 
-    NodeSPT* aux = sptAccess(tree, data); // The to be deleted node
+    NodeSPT* aux = sptSearch(tree, data.name); // The to be deleted node
     
     // Ends function in case the accessed node isn't the one with the desired data
     if (strcompare(data.name, aux->data.name) != 0)
@@ -236,7 +235,7 @@ void sptNodeDelete(SPT* tree, type data) {
     // Case there's only one node on the tree
     if (aux->right == NULL && aux->left == NULL) {
         free(aux);
-        printf("\nNode with data %d (tree root) deleted", data);
+        printf("\nNode with name %s (tree root) deleted", data.name);
         tree->root = NULL;
         return;
     }
@@ -256,14 +255,14 @@ void sptNodeDelete(SPT* tree, type data) {
             newRoot = newRoot->right;
         // printf("\nOut of rightmost node while");
 
-        sptAccessSearch(auxTrees[0].root, NULL, newRoot->data, &tree->numRotations); // newRoot becomes the left tree's root
+        sptAccessSearch(auxTrees[0].root, NULL, newRoot->data.name, &tree->numRotations, NULL); // newRoot becomes the left tree's root
         // printf("\nOut of join splay");
     }
 
     *tree = sptJoin(auxTrees, newRoot); // Reconnects the auxiliar trees
     // printf("\nSuccessfull join");
 
-    printf("\nNode with data %d deleted", data);
+    printf("\nNode with name %s deleted", data.name);
 }
 
 static void sptPrintRecursive(NodeSPT* node, int depth) {
@@ -271,11 +270,11 @@ static void sptPrintRecursive(NodeSPT* node, int depth) {
         for (int i = 0; i < depth; i++) // Prints '=' equal times to the node's depth count
             printf("=");
 
-        printf("%d", node->data);
-        if (node->left != NULL) printf(" (%d", node->left->data);
-        else printf(" (Nan");
-        if (node->right != NULL) printf(", %d)", node->right->data);
-        else printf(", Nan)");
+        printf("%s", node->data.name);
+        if (node->left != NULL) printf(" (%s", node->left->data.name);
+        else printf(" (-");
+        if (node->right != NULL) printf(", %s)", node->right->data.name);
+        else printf(", -)");
         printf("\n");
 
         sptPrintRecursive(node->left, depth + 1);
@@ -311,6 +310,32 @@ void sptClear(SPT* tree) {
     sptClearRecursive(tree->root);
 
     tree->root = NULL;
+}
 
-    printf("\nSplay tree successfully cleared");
+static int sptCountNodesRecursive(NodeSPT* a) {
+    if (a == NULL)
+        return 0;
+
+    return sptCountNodesRecursive(a->left) + sptCountNodesRecursive(a->right) + 1;
+    
+}
+
+int sptCountNodes(SPT tree) {
+    return sptCountNodesRecursive(tree.root);
+}
+
+void sptPrintResults(SPT tree) {
+    printf("\n\n----- SPLAY -----");
+    printf("\nNum nodos: %d", sptCountNodes(tree));
+    printf("\nAltura: %d", sptHeight(tree));
+    printf("\nNum rotacoes: %d", tree.numRotations);
+    printf("\nComparacoes: %d", tree.totalComparisons);
+}
+
+void sptFilePrintResults(SPT tree, FILE* file) {
+    fprintf(file, "\n\n----- SPLAY -----");
+    fprintf(file, "\nNum nodos: %d", sptCountNodes(tree));
+    fprintf(file, "\nAltura: %d", sptHeight(tree));
+    fprintf(file, "\nNum rotacoes: %d", tree.numRotations);
+    fprintf(file, "\nComparacoes: %d", tree.totalComparisons);
 }

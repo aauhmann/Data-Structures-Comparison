@@ -3,7 +3,8 @@
 TreeOps ops[] = { 
     {bstInsertWrapper, bstSearchWrapper},
     {avlInsertWrapper, avlSearchWrapper},
-    {rbtInsertWrapper, rbtSearchWrapper} 
+    {rbtInsertWrapper, rbtSearchWrapper},
+    {sptInsertWrapper, sptSearchWrapper}
 };
 
 void bstInsertWrapper(void* tree, Game game) {
@@ -16,6 +17,10 @@ void avlInsertWrapper(void* tree, Game game) {
 
 void rbtInsertWrapper(void* tree, Game game) {
     rbtInsert((RBT*)tree, game);
+}
+
+void sptInsertWrapper(void* tree, Game game) {
+    sptInsert((SPT*)tree, game);
 }
 
 void treeInsert(void* tree, Game game, Trees type) {
@@ -32,6 +37,10 @@ void* avlSearchWrapper(void* tree, char* key) {
 
 void* rbtSearchWrapper(void* tree, char* key) {
     return rbtSearch((RBT*)tree, key);
+}
+
+void* sptSearchWrapper(void* tree, char* key) {
+    return sptSearch((SPT*)tree, key);
 }
 
 void* treeSearch(void* tree, char* key, Trees type) {
