@@ -7,6 +7,7 @@
 #define STEAM_GAMES argv[1]
 #define DESIRED_GAMES argv[2]
 #define OUTPUT_FILE argv[3]
+#define NUM_ARGS 4
 
 void printResults(float* estimatedTime, float* creationTime, float* searchTime, BST bst, AVL avl, RBT rbt, SPT spt);
 void fprintResults(FILE* file, float* estimatedTime, float* creationTime, float* searchTime, BST bst, AVL avl, RBT rbt, SPT spt);
@@ -16,7 +17,7 @@ float TimedGameTreeSearch(FILE* desiredGamesFile, void* tree, Trees type, float*
 
 int main(int argc, char* argv[]) {
     
-    if (argc != 4) {
+    if (argc != NUM_ARGS) {
         printf("Numero de parametros incorreto. Entrada do programa deve ser:");
         printf(" exemplo <arq_steamgames> <arq_listajogos> <arq_saida>");
         return 1;
@@ -25,40 +26,41 @@ int main(int argc, char* argv[]) {
     BST bst = bstNew();
     AVL avl = avlInitialize();
     RBT rbt = rbtNew();
-    SPT spt = sptNew();
 
-    float generationTime[4];
-    float searchTime[4];
-    float estimatedTime[4] = {0, 0, 0, 0};
+    float generationTime[NUM_TREES];
+    float searchTime[NUM_TREES];
+    float estimatedTime[NUM_TREES];
+
+    //FILE* file[NUM_TREES] = {}
 
     FILE* steamGamesFile = fopen(STEAM_GAMES, "r");
     FILE* desiredGamesFile = fopen(DESIRED_GAMES, "r");
     FILE* outputFile = fopen(OUTPUT_FILE, "w");
-
+    
     if (steamGamesFile == NULL) {       // Checks file opening
         printf("Erro ao abrir o arquivo %s", STEAM_GAMES);
         return 1;
     }
-
+    
     if (desiredGamesFile == NULL) {       // Checks file opening
         printf("Erro ao abrir o arquivo %s", DESIRED_GAMES);
         return 1;
     }
-
+    
     if (outputFile == NULL) {
         printf("Erro ao abrir o arquivo %s", OUTPUT_FILE);
         return 1;
     }
-
-
-    // // BST TREE
-    // generationTime[BSTT] = TimedGamesDataToTree(steamGamesFile, &bst, BSTT);
     
-    // searchTime[BSTT] = TimedGameTreeSearch(desiredGamesFile, &bst, BSTT, &estimatedTime[BSTT]);
-
-    // rewind(steamGamesFile);
-    // rewind(desiredGamesFile);
-
+    
+    // BST TREE
+    generationTime[BSTT] = TimeGamesDataToTree(steamGamesFile, &bst, BSTT);
+    
+    searchTime[BSTT] = TimedGameTreeSearch(desiredGamesFile, &bst, BSTT, &estimatedTime[BSTT]);
+    
+    rewind(steamGamesFile);
+    rewind(desiredGamesFile);
+    
     // AVL TREE
     // generationTime[AVLT] = TimedGamesDataToTree(steamGamesFile, &avl, AVLT);
 
@@ -70,6 +72,16 @@ int main(int argc, char* argv[]) {
     // RB TREE
     generationTime[RBTT] = TimedGamesDataToTree(steamGamesFile, &rbt, RBTT);
 
+    generationTime[AVLT] = TimeGamesDataToTree(steamGamesFile, &avl, AVLT);
+    
+    searchTime[AVLT] = TimedGameTreeSearch(desiredGamesFile, &avl, AVLT, &estimatedTime[AVLT]);    
+    
+    rewind(steamGamesFile);
+    rewind(desiredGamesFile);
+    
+    // RBT TREE
+    generationTime[RBTT] = TimeGamesDataToTree(steamGamesFile, &rbt, RBTT);
+    
     searchTime[RBTT] = TimedGameTreeSearch(desiredGamesFile, &rbt, RBTT, &estimatedTime[RBTT]); 
     
     rewind(steamGamesFile);
@@ -90,6 +102,10 @@ int main(int argc, char* argv[]) {
 
     printResults(estimatedTime, generationTime, searchTime, bst, avl, rbt, spt);
     fprintResults(outputFile, estimatedTime, generationTime, searchTime, bst, avl, rbt, spt);
+    
+    
+    printResults(estimatedTime, generationTime, searchTime, bst, avl, rbt);
+    fprintResults(outputFile, estimatedTime, generationTime, searchTime, bst, avl, rbt);
     
     bstClear(&bst);
     // avlClear(&avl);
