@@ -9,7 +9,6 @@ typedef Game type;
 typedef struct NodeAVL {
     Game key;
     int factor;
-    int depth;
     struct NodeAVL* parent;
     struct NodeAVL* left;
     struct NodeAVL* right;
@@ -17,7 +16,6 @@ typedef struct NodeAVL {
 
 typedef struct AVL {
     NodeAVL* root;
-    int height;
     int totalComparisons;
     int numRotations;
 } AVL;

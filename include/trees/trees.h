@@ -3,6 +3,7 @@
 #include "bst.h"
 #include "avl.h"
 #include "rbt.h"
+#include "splay.h"
 
 typedef enum {BSTT, AVLT, RBTT, SPLAYT} Trees;
 
