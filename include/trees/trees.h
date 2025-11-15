@@ -4,6 +4,8 @@
 #include "avl.h"
 #include "rbt.h"
 
+#define NUM_TREES 4
+
 typedef enum {BSTT, AVLT, RBTT, SPLAYT} Trees;
 
 typedef void (*InsertFunction)(void*, Game);
