@@ -6,36 +6,30 @@
 
 typedef Game type;
 
-typedef struct NodeAVL {
-    Game key;
+typedef struct s_NodeAVL {
+    type key;
     int factor;
-    int depth;
-    struct NodeAVL* parent;
-    struct NodeAVL* left;
-    struct NodeAVL* right;
+    struct s_NodeAVL* left;
+    struct s_NodeAVL* right;
 } NodeAVL;
 
 typedef struct AVL {
     NodeAVL* root;
-    int height;
     int totalComparisons;
     int numRotations;
 } AVL;
 
-typedef void (*NodeFunctionAVL)(NodeAVL*);
+typedef void (*NodeFunction)(NodeAVL*);
 
-AVL avlInitialize();
-bool avlEmpty(AVL tree);
+AVL avlNew();
 void avlInsert(AVL* tree, type key);
-NodeAVL* avlSearchByKey(AVL* tree, type key, NodeFunctionAVL function);
-void avlInOrder(NodeAVL* root, NodeFunctionAVL function);
-void avlPreOrder(NodeAVL* root, NodeFunctionAVL function);
-void avlPostOrder(NodeAVL* root, NodeFunctionAVL function);
-void avlHeight(AVL* tree);
+NodeAVL* avlNodeGet(AVL tree, type key);
+void avlNodePrintDepth(AVL tree, type key);
+void avlNodePrint(AVL tree, type key);
 void avlPrint(AVL tree);
+int avlTreeHeight(AVL tree);
+int avlTreeFactor(AVL tree);
 void avlClear(AVL* tree);
-void avlFactor(NodeAVL* root, int* factor);
 void avlPrintResults(AVL tree);
 void avlFilePrintResults(AVL tree, FILE* file);
-int avlCountNodes(AVL tree);
 NodeAVL* avlSearch(AVL* tree, char* key);

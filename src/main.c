@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
     }
     
     BST bst = bstNew();
-    AVL avl = avlInitialize();
+    AVL avl = avlNew();
     RBT rbt = rbtNew();
     SPT spt = sptNew();
 
