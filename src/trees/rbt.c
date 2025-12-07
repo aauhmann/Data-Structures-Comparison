@@ -55,7 +55,8 @@ static void rbSubtreeDoubleRotateRight(RBT* tree, NodeRBT* root) {
     NodeRBT* auxR = auxL->right;
     NodeRBT* parent = root->parent;
 
-    tree->numRotations += 2;
+    //tree->numRotations += 2;
+    tree->numRotations++;
 
     if (root == tree->root)
         tree->root = auxR;
@@ -83,8 +84,9 @@ static void rbSubtreeDoubleRotateLeft(RBT* tree, NodeRBT* root) {
     NodeRBT* auxL = auxR->left;
     NodeRBT* parent = root->parent;
 
-    tree->numRotations += 2;
-    
+    //tree->numRotations += 2;
+    tree->numRotations++;
+
     if (root == tree->root)
         tree->root = auxL;
 

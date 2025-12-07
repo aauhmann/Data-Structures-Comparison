@@ -314,7 +314,8 @@ void avlSubtreeDoubleRotateRight(AVL* tree, NodeAVL* root) {
     NodeAVL* auxR = auxL->right;
     NodeAVL* parent = root->parent;
 
-    tree->numRotations += 2;
+    //tree->numRotations += 2;
+    tree->numRotations++;
 
     if (root == tree->root)
         tree->root = auxR;
@@ -355,7 +356,8 @@ void avlSubtreeDoubleRotateLeft(AVL* tree, NodeAVL* root) {
     NodeAVL* auxL = auxR->left;
     NodeAVL* parent = root->parent;
 
-    tree->numRotations += 2;
+    //tree->numRotations += 2;
+    tree->numRotations++;
 
     if (root == tree->root)
         tree->root = auxL;
