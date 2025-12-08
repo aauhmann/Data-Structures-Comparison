@@ -83,7 +83,6 @@ int main(int argc, char* argv[]) {
     
     printResults(estimatedTime, generationTime, searchTime, bst, avl, rbt, spt);
     fprintResults(outputFile, estimatedTime, generationTime, searchTime, bst, avl, rbt, spt);
-
     
     bstClear(&bst);
     avlClear(&avl);
@@ -153,7 +152,7 @@ float TimedGamesDataToTree(FILE* file, void* tree, Trees type) {
         char *word = strtok(line, DELIMITERS);      // Gets the game's name(first word)
 
         Game game = { (char*)malloc(strlen(word) + 1), atof(strtok(NULL, DELIMITERS)) }; // Allocs name's memmory and gets the average gameplay time(second word)
-
+        
         strncpy(game.name, word, strlen(word) + 1);  // Puts the game's name into the struct
 
         cronStart(&insertionCron);

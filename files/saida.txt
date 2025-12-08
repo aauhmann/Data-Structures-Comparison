@@ -2,34 +2,34 @@
 Num nodos: 658
 Altura: 21
 Num rotacoes: 0
-Comparacoes: 544
-Tempo estimado: 139.79 h
-Tempo de criacao: 0.00 ms
+Comparacoes: 3049
+Tempo estimado: 2684.73 h
+Tempo de criacao: 4.00 ms
 Tempo de busca: 0.00 ms
 
 ----- AVL -----
-Num nodos: 658
-Altura: 11
-Num rotacoes: 505
-Comparacoes: 401
-Tempo estimado: 139.79 h
-Tempo de criacao: 0.00 ms
+Num nodos: 3598
+Altura: 14
+Num rotacoes: 2726
+Comparacoes: 2154
+Tempo estimado: 2684.73 h
+Tempo de criacao: 100.00 ms
 Tempo de busca: 0.00 ms
 
 ----- RUBRO-NEGRA -----
-Num nodos: 658
-Altura: 11
-Num rotacoes: 406
-Comparacoes: 402
-Tempo estimado: 139.79 h
-Tempo de criacao: 0.00 ms
-Tempo de busca: 0.00 ms
+Num nodos: 3598
+Altura: 15
+Num rotacoes: 1480
+Comparacoes: 2162
+Tempo estimado: 2684.73 h
+Tempo de criacao: 4.00 ms
+Tempo de busca: 1.00 ms
 
 ----- SPLAY -----
-Num nodos: 658
-Altura: 24
-Num rotacoes: 8237
-Comparacoes: 519
-Tempo estimado: 139.79 h
-Tempo de criacao: 0.00 ms
+Num nodos: 3598
+Altura: 30
+Num rotacoes: 62551
+Comparacoes: 3311
+Tempo estimado: 2684.73 h
+Tempo de criacao: 6.00 ms
 Tempo de busca: 0.00 ms

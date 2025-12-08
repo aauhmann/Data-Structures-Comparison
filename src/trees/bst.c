@@ -98,7 +98,7 @@ static void bstPrintRecur(NodeBST* a, int cont) {
 
     for (int i = 0; i <= cont; i++) printf("=");
     
-    printf("%s\n", a->game.name);
+    printf("%s, %.3f\n", a->game.name, a->game.time);
 
     if (a->left != NULL) bstPrintRecur(a->left, cont + 1);
 
