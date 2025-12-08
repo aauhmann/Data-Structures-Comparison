@@ -1,5 +1,5 @@
 #include "trees.h"
-#include "cronometer.h"
+#include "chronometer.h"
 #include "printResults.h"
 
 #define DELIMITERS ",\n"
@@ -94,10 +94,10 @@ int main(int argc, char* argv[]) {
 
 float TimedGamesDataToTree(FILE* file, void* tree, Trees type) {
 
-    Cronometer insertionCron = cronNew();
+    Chronometer insertionChron = chronNew();
     char line[1000];
 
-    cronStart(&insertionCron);
+    chronStart(&insertionChron);
 
     // Dataset loop
     while (fgets(line, sizeof(line), file)) {
@@ -111,18 +111,18 @@ float TimedGamesDataToTree(FILE* file, void* tree, Trees type) {
         
     }
     
-    cronStop(&insertionCron);
+    chronStop(&insertionChron);
 
-    return insertionCron.millisec;
+    return insertionChron.millisec;
 }
 
 float TimedGameTreeSearch(FILE* desiredGamesFile, void* tree, Trees type, float* estimatedTime) {
 
-    Cronometer searchCron = cronNew();
+    Chronometer searchChron = chronNew();
     char line[1000];
     *estimatedTime = 0;
     
-    cronStart(&searchCron);
+    chronStart(&searchChron);
 
     // Search loop
     while (fgets(line, sizeof(line), desiredGamesFile)) {   
@@ -157,7 +157,7 @@ float TimedGameTreeSearch(FILE* desiredGamesFile, void* tree, Trees type, float*
         } 
     }
 
-    cronStop(&searchCron);
+    chronStop(&searchChron);
 
-    return searchCron.millisec;
+    return searchChron.millisec;
 }

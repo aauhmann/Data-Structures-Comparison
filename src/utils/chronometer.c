@@ -1,9 +1,10 @@
-#include "cronometer.h"
+#include "chronometer.h"
+#include <stdbool.h>
 
 static double qpFreq = 0;
 static bool isFreqSet = 0;
 
-Cronometer cronNew() {
+Chronometer chronNew() {
     if (!isFreqSet) {
         LARGE_INTEGER f;
         QueryPerformanceFrequency(&f);
@@ -11,17 +12,17 @@ Cronometer cronNew() {
         isFreqSet = true;
     }
 
-    Cronometer cron;
+    Chronometer cron;
     cron.millisec = 0;
     cron.base.QuadPart = 0;
     return cron;
 }
 
-void cronStart(Cronometer* cron) {
+void chronStart(Chronometer* cron) {
     QueryPerformanceCounter(&cron->base);
 }
 
-void cronStop(Cronometer* cron) {
+void chronStop(Chronometer* cron) {
     LARGE_INTEGER end;
     QueryPerformanceCounter(&end);
 
@@ -29,7 +30,7 @@ void cronStop(Cronometer* cron) {
 
 }
 
-void cronReset(Cronometer* cron) {
+void chronReset(Chronometer* cron) {
     cron->base.QuadPart = 0;
     cron->millisec = 0;
 }
