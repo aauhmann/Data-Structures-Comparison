@@ -7,8 +7,8 @@
             "request": "launch",
             "program": "${workspaceFolder}/program.exe",
             "args": [
-                //"files/dataset.csv", "files/lista_jogador1.txt", "files/saida.txt"
-                "files/steam_games_sorted.csv", "files/lista_jogador1.txt", "files/saida.txt"
+                "files/dataset.csv", "files/lista_jogador1.txt", "files/saida.txt"
+                //"files/steam_games_sorted.csv", "files/lista_jogador1.txt", "files/saida.txt"
                  //"files/teste.csv", "files/lista_teste.txt", "files/saida.txt"
             ], /// a files\dataset.csv files\lista_jogador1.txt files\saida.txt
             "stopAtEntry": false,

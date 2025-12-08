@@ -2,414 +2,312 @@
 #include "strcompare.h"
 #include <stdlib.h>
 
-bool avlNodeFixFactor(NodeAVL* node);
-void avlNodePrint(NodeAVL* node);
-void avlNodeDepthAndFactor(NodeAVL* node);
-void avlNodeDepthDec(NodeAVL* node);
-void avlNodeDepthInc(NodeAVL* node);
-void avlNodeClear(NodeAVL* node);
-//bool avlTreeFactorCheck(NodeAVL* root, int* currentDepth, type* key, bool* needRotation);
-void avlSubtreeMaxDepth(NodeAVL* root, int* maxDepth);
-void avlSubtreeRotate(AVL* tree, NodeAVL* root);
-void avlSubtreeRotateRight(AVL* tree, NodeAVL* root);
-void avlSubtreeRotateLeft(AVL* tree, NodeAVL* root);
-void avlSubtreeDoubleRotateRight(AVL* tree, NodeAVL* root);
-void avlSubtreeDoubleRotateLeft(AVL* tree, NodeAVL* root);
-int avlNodeFactor(NodeAVL* node);
-
-AVL avlInitialize() {
-    return (AVL){NULL, 0, 0, 0};
+AVL avlNew() {
+    return (AVL){NULL, 0, 0}; // Returns an empty splay tree with zeroed counters
 }
 
-bool avlEmpty(AVL tree) {
-    if (tree.root == NULL) return true;
-    else return false;
+static bool avlEmpty(AVL tree) {
+    return (tree.root == NULL); // Returns true in case the tree is empty and false in case it isn't
 }
 
-void avlInsert(AVL* tree, type key) {
-    NodeAVL* new = (NodeAVL*)malloc(sizeof(NodeAVL));
-    NodeAVL* aux = tree->root;
-    bool needRotation = false;
+static int avlNodeHeight(NodeAVL* node) {
+    if (node == NULL)
+        return 0;
+    
+    int leftHeight = avlNodeHeight(node->left);
+    int rightHeight = avlNodeHeight(node->right);
+    
+    if (leftHeight > rightHeight)
+        return leftHeight + 1;
+    else // rightHeight > leftHeight
+        return rightHeight + 1;
+}
 
-    new->key = key;
-    new->left = new->right = NULL;
-    new->factor = 0;
+int avlTreeHeight(AVL tree) {
+    return avlNodeHeight(tree.root);
+}
 
+static int avlNodeFactorBalance(NodeAVL* node) {
+    if (node == NULL) return 0;
+
+    int leftHeight = avlNodeHeight(node->left);
+    int rightHeight = avlNodeHeight(node->right);
+
+    node->factor = leftHeight - rightHeight;
+
+    return node->factor;
+}
+
+static void avlTreeFactorRecursion(NodeAVL* node, int* maxFactor) {
+    if (node == NULL) return;
+
+    if (abs(node->factor) > abs(*maxFactor))
+        *maxFactor = node->factor;
+        
+    avlTreeFactorRecursion(node->left, maxFactor);
+    avlTreeFactorRecursion(node->right, maxFactor);
+}
+
+int avlTreeFactor(AVL tree) {
+    if (avlEmpty(tree)) {
+        printf("\nEmpty AVL tree");
+        return 0;
+    }
+
+    int maxFactor = 0;
+    avlTreeFactorRecursion(tree.root, &maxFactor);
+
+    return maxFactor;
+}
+
+static void avlRotateRight(NodeAVL* child, NodeAVL* node, NodeAVL* father) {
+    node->left = child->right;
+    child->right = node;
+    child->factor = 0;
+
+    if (father != NULL) {
+        // Parent conncetion
+        if (node == father->left)
+            father->left = child;
+        else // If (node == father->right)
+            father->right = child;
+    }
+}
+
+static void avlRotateLeft(NodeAVL* child, NodeAVL* node, NodeAVL* father) {
+    node->right = child->left;
+    child->left = node;
+    child->factor = 0;
+
+    if (father != NULL) {
+        // Parent connection
+        if (node == father->left)
+            father->left = child;
+        else // If (node == father->right)
+            father->right = child;
+    }
+}
+
+static void avlRotation(NodeAVL* node, NodeAVL* father, AVL* tree) {
+    if (node->factor > 1) {
+        if (node->left->factor > 0) {
+            // Right rotation case
+            if (node == tree->root) tree->root = node->left; // Updates tree's root
+            avlRotateRight(node->left, node, father);
+            tree->numRotations++;
+        }
+        else { // If node->left->factor < 0
+            // Double right rotation case
+            if (node == tree->root) tree->root = node->left->right; // Updates tree's root
+            avlRotateLeft(node->left->right, node->left, node);
+            avlRotateRight(node->left, node, father);
+            tree->numRotations += 2;
+        }
+    }
+    else { // node->factor < -1
+        if (node->right->factor < 0) {
+            // Left rotation case
+            if (node == tree->root) tree->root = node->right; // Updates tree's root
+            avlRotateLeft(node->right, node, father);
+            tree->numRotations++;
+        }
+        else { // If node->right->factor > 0
+            // Double left rotation case
+            if (node == tree->root) tree->root = node->right->left; // Updates tree's root
+            avlRotateRight(node->right->left, node->right, node);
+            avlRotateLeft(node->right, node, father);
+            tree->numRotations += 2;
+        }
+    }
+}
+
+static NodeAVL* avlInsertRecursion(NodeAVL* node, NodeAVL* father, type key, AVL* tree) {
+    if (node == NULL) {
+        // Empty space to insertion
+        NodeAVL* new = (NodeAVL*)malloc(sizeof(NodeAVL));
+        new->left = new->right = NULL;
+        new->key = key;
+        new->factor = 0;
+
+        // Father connection
+        if (strcompare(key.name, father->key.name) < 0)
+            father->left = new;
+        else // If key > father->key
+            father->right = new;
+
+        return new;
+    }
+    
+    if (strcompare(key.name, node->key.name) == 0) // Node with key found
+        return NULL;
+    
+    NodeAVL* aux;
+
+    if (strcompare(key.name, node->key.name) < 0)
+        aux = avlInsertRecursion(node->left, node, key, tree);
+    else // If (key > node->key)
+        aux = avlInsertRecursion(node->right, node, key, tree);
+
+    // If a node has been inserted
+    if (aux != NULL) {
+        avlNodeFactorBalance(node);
+
+        // Case the node's unbalanced
+        if (abs(node->factor) > 1)
+            avlRotation(node, father, tree);
+    }
+
+    return aux;
+}
+
+void avlInsert(AVL* tree, type key) {    
     if (avlEmpty(*tree)) {
+        // Empty tree case
+        NodeAVL* new = (NodeAVL*)malloc(sizeof(NodeAVL));
+        new->left = new->right = NULL;
+        new->key = key;
         tree->root = new;
-        tree->height = 1;
-        new->parent = NULL;
-        new->depth = 1;
         return;
     }
-    
-    while (true) {
-        if (strcompare(key.name, aux->key.name) < 0) {
-            if (aux->left == NULL) {
-                aux->left = new;
-                new->depth = aux->depth + 1;
-                if (aux->right == NULL)
-                    needRotation = avlNodeFixFactor(aux);
-                else aux->factor++;
-                break;
-            }
-            else aux = aux->left;
-        }
-        else if (strcompare(key.name, aux->key.name) > 0) {
-            if (aux->right == NULL) {
-                aux->right = new;
-                new->depth = aux->depth + 1;
-                if (aux->left == NULL)
-                    needRotation = avlNodeFixFactor(aux);
-                else aux->factor--;
-                break;
-            }
-            else aux = aux->right;
-        }
-        else {
-            return;
-        }
-    }
 
-    new->parent = aux;
-    
-    if (needRotation) {
-        avlSubtreeRotate(tree, aux);
-        avlHeight(tree);
-    }
-    else if (tree->height < new->depth)
-        tree->height = new->depth;
+    NodeAVL* aux = avlInsertRecursion(tree->root, NULL, key, tree);
+
+    if (aux == NULL)
+        return;
 }
 
-bool avlNodeFixFactor(NodeAVL* node) {
-    bool needRotation = false;
-
-    while (node != NULL) {
-        node->factor = avlNodeFactor(node);
-
-        if (abs(node->factor) > 1)
-            needRotation = true;
-
-        node = node->parent;
-    }
-
-    return needRotation;
-}
-
-void avlNodePrint(NodeAVL* node) {
-    printf("\n");
-    for (int i = 0; i < node->depth; i++)
-        printf("=");
-    printf("%s", node->key.name);
-}
-
-void avlNodeDepthAndFactor(NodeAVL* node) {
-    printf("\nDepth: %d", node->depth);
-    printf("\nFactor: %d", node->factor);
-}
-
-void avlNodeDepthDec(NodeAVL* node) {
-    node->depth--;
-}
-
-void avlNodeDepthInc(NodeAVL* node) {
-    node->depth++;
-}
-
-void avlNodeClear(NodeAVL* node) {
-    NodeAVL* parent = node->parent;
-
-    if (parent != NULL) {
-        if (parent->left == node) parent->left = NULL;
-        else parent->right = NULL;
-    }
-
-    free(node->key.name);
-    free(node);
-}
-
-// bool avlTreeFactorCheck(NodeAVL* root, int* currentDepth, type* key, bool* needRotation) {
-//     if (abs(root->factor) > 1 && root->depth > *currentDepth) {
-//         *currentDepth = root->depth;
-//         *key = root->key;
-//         *needRotation = true;
-//     }
-//     avlTreeFactorCheck(root->left, currentDepth, key, needRotation);
-//     avlTreeFactorCheck(root->right, currentDepth, key, needRotation);
-    
-//     return *needRotation;
-// }
-
-NodeAVL* avlSearchByKey(AVL* tree, type key, NodeFunctionAVL function) {
-    if (avlEmpty(*tree)) {
-        printf("\nEmpty tree");
+NodeAVL* avlNodeGet(AVL tree, type key) {
+    if (avlEmpty(tree)) {
+        // Checks if the avl tree is empty
+        printf("\nEmpty AVL tree");
         return NULL;
     }
 
-    NodeAVL* aux = tree->root;
+    NodeAVL* aux = tree.root;
 
-    while (aux != NULL) {
+    // Stops if the node isn't on the tree or if it's found
+    while (aux != NULL && strcompare(key.name, aux->key.name) != 0) {
         if (strcompare(key.name, aux->key.name) < 0)
             aux = aux->left;
-        else if (strcompare(key.name, aux->key.name) > 0)
+        else // If key > aux->right
             aux = aux->right;
-        else {
-            NodeAVL* node = aux;
-            if (function != NULL)
-                function(aux);
-            return node;
-        }
     }
 
-    printf("Key not found");
-    return NULL;
+    if (aux == NULL) // Node with key not found
+        return NULL;
+
+    // Node with the key is found
+    return aux;
 }
 
-void avlInOrder(NodeAVL* root, NodeFunctionAVL function) {
-    if (root != NULL && function != NULL) {
-        avlInOrder(root->left, function);
-        function(root);
-        avlInOrder(root->right, function);
+static int avlNodeDepth(AVL tree, type key) {
+    int depth = 1;
+
+    NodeAVL* aux = tree.root;
+
+    while (aux != NULL && strcompare(key.name, aux->key.name) != 0) {
+        if (strcompare(key.name, aux->key.name) < 0)
+            aux = aux->left;
+        else
+            aux = aux->right;
+
+        depth++;
     }
+
+    if (aux == NULL) // Node not found
+        return -1;
+    else // Node found
+        return depth;
 }
 
-void avlPreOrder(NodeAVL* root, NodeFunctionAVL function) {
-    if (root != NULL && function != NULL) {
-        function(root);
-        avlPreOrder(root->left, function);
-        avlPreOrder(root->right, function);
+void avlNodePrintDepth(AVL tree, type key) {
+    if (avlEmpty(tree)) {
+        // Checks if the avl tree is empty
+        printf("\nEmpty AVL tree");
+        return;
     }
+
+    int depth = avlNodeDepth(tree, key);
+
+    if (depth == -1)
+        return;
+
+    printf("Depth: %d", depth);
 }
 
-void avlPostOrder(NodeAVL* root, NodeFunctionAVL function) {
-    if (root != NULL && function != NULL) {
-        avlPostOrder(root->left, function);
-        avlPostOrder(root->right, function);
-        function(root);
+void avlNodePrint(AVL tree, type key) {
+    if (avlEmpty(tree)) {
+        // Checks if the avl tree is empty
+        printf("\nEmpty AVL tree");
+        return;
+    }
+
+    NodeAVL* aux = tree.root;
+
+    while (aux != NULL && strcompare(key.name, aux->key.name) != 0) {
+        if (strcompare(key.name, aux->key.name) < 0)
+            aux = aux->left;
+        else // If key > aux->key
+            aux = aux->right;
+    }
+
+    if (aux == NULL) {
+        printf("\nKey %s not in the tree", key.name);
+        return;
+    }
+
+    printf("Key: %s", aux->key.name);
+}
+
+static void avlPrintRecursive(NodeAVL* node, int depth) {
+    if (node != NULL) {
+        for (int i = 0; i < depth; i++) // Prints '=' equal times to the node's depth count
+            printf("=");
+
+        avlNodeFactorBalance(node);
+
+        printf("%s", node->key.name);
+        printf(" - FB: %d", node->factor);
+        if (node->left != NULL) printf(" (%s", node->left->key.name);
+        else printf(" (Nan");
+        if (node->right != NULL) printf(", %s)", node->right->key.name);
+        else printf(", Nan)");
+        printf("\n");
+
+        avlPrintRecursive(node->left, depth + 1);
+        avlPrintRecursive(node->right, depth + 1);
     }
 }
 
 void avlPrint(AVL tree) {
-    if (avlEmpty(tree)) printf("\nEmpty tree");
-    else avlPreOrder(tree.root, avlNodePrint);
-}
-
-void avlHeight(AVL* tree) {
-    if (avlEmpty(*tree)) {
-        tree->height = 0;
-    } else {
-        tree->height = 0;
-        avlSubtreeMaxDepth(tree->root, &tree->height);
+    if (avlEmpty(tree))
+        printf("\n\nEmpty AVL tree");
+    else {
+        printf("\n\n----- PRINTING AVL TREE -----\n");
+        avlPrintRecursive(tree.root, 1);
     }
 }
 
-void avlSubtreeMaxDepth(NodeAVL* root, int* maxDepth) {
-    if (root != NULL) {
-        if (root->depth > *maxDepth) *maxDepth = root->depth;
-        avlSubtreeMaxDepth(root->left, maxDepth);
-        avlSubtreeMaxDepth(root->right, maxDepth);
+static void avlClearRecursion(NodeAVL* node) {
+    if (node != NULL) {
+        avlClearRecursion(node->left);
+        avlClearRecursion(node->right);
+
+        free(node);
     }
 }
 
 void avlClear(AVL* tree) {
-    if (avlEmpty(*tree))
-        printf("\nEmpty tree");
-    else {
-        avlPostOrder(tree->root, avlNodeClear);
-        tree->root = NULL;
-        tree->height = 0;
-        // printf("\nTree cleared");
+    if (avlEmpty(*tree)) {
+        // Checks if the tree is empty
+        printf("\nEmpty AVL tree");
+        return;
     }
 
-    tree->numRotations = 0;
-}
+    avlClearRecursion(tree->root);
 
-void avlSubtreeRotate(AVL* tree, NodeAVL* root) {
-    NodeAVL* parent;
-
-    while (root != NULL) {
-        parent = root->parent;
-
-        if (root->factor > 1) {
-            if (root->left->factor > 0)
-                avlSubtreeRotateRight(tree, root);
-            else
-                avlSubtreeDoubleRotateRight(tree, root);
-
-            break;
-        }
-        else if (root->factor < -1) {
-            if (root->right->factor < 0)
-                avlSubtreeRotateLeft(tree, root);
-            else
-                avlSubtreeDoubleRotateLeft(tree, root);
-
-            break;
-        }
-
-        root = parent;
-    }
-}
-
-void avlSubtreeRotateRight(AVL* tree, NodeAVL* root) {
-    NodeAVL* aux = root->left;
-    NodeAVL* parent = root->parent;
-
-    tree->numRotations++;
-
-    if (root == tree->root)
-        tree->root = aux;
-
-    root->left = aux->right;
-    if (root->left != NULL)
-        root->left->parent = root;
-    aux->parent = parent;
-    if (parent != NULL) {
-        if (parent->left == root) parent->left = aux;
-        else parent->right = aux;
-    }
-    aux->right = root;
-    root->parent = aux;
-
-    root->depth++;
-    aux->depth--;
-    avlInOrder(root->right, avlNodeDepthInc);
-    avlInOrder(aux->left, avlNodeDepthDec);
-
-    root->factor = 0;
-    aux->factor = avlNodeFactor(aux);
-}
-
-void avlSubtreeRotateLeft(AVL* tree, NodeAVL* root) {
-    NodeAVL* aux = root->right;
-    NodeAVL* parent = root->parent;
-
-    tree->numRotations++;
-
-    if (root == tree->root)
-        tree->root = aux;
-
-    root->right = aux->left;
-    if (root->right != NULL)
-        root->right->parent = root;
-    aux->parent = parent;
-    if (parent != NULL) {
-        if (parent->left == root) parent->left = aux;
-        else parent->right = aux;
-    }
-    aux->left = root;
-    root->parent = aux;
-
-    root->depth++;
-    aux->depth--;
-    avlInOrder(root->left, avlNodeDepthInc);
-    avlInOrder(aux->right, avlNodeDepthDec);
-
-    root->factor = 0;
-    aux->factor = avlNodeFactor(aux);
-}
-
-void avlSubtreeDoubleRotateRight(AVL* tree, NodeAVL* root) {
-    NodeAVL* auxL = root->left;
-    NodeAVL* auxR = auxL->right;
-    NodeAVL* parent = root->parent;
-
-    //tree->numRotations += 2;
-    tree->numRotations++;
-
-    if (root == tree->root)
-        tree->root = auxR;
-
-    auxL->right = auxR->left;
-    if (auxL->right != NULL)
-        auxL->right->parent = auxL;
-    root->left = auxR->right;
-    if (root->left != NULL)
-        root->left->parent = root;
-    auxR->parent = root->parent;
-    if (parent != NULL) {
-        if (parent->left == root) parent->left = auxR;
-        else parent->right = auxR;
-    }
-    root->parent = auxR;
-    auxL->parent = auxR;
-    auxR->left = auxL;
-    auxR->right = root;
-
-    root->depth++;
-    auxR->depth -= 2;
-    avlInOrder(root->right, avlNodeDepthInc);
-    avlInOrder(root->left, avlNodeDepthDec);
-    avlInOrder(auxL->right, avlNodeDepthDec);
-
-    if (auxR->factor == 1) root->factor = -1;
-    else root->factor = 0;
-
-    if (auxR->factor == -1) auxL->factor = 1;
-    else auxL->factor = 0;
-
-    auxR->factor = avlNodeFactor(auxR);
-}
-
-void avlSubtreeDoubleRotateLeft(AVL* tree, NodeAVL* root) {
-    NodeAVL* auxR = root->right;
-    NodeAVL* auxL = auxR->left;
-    NodeAVL* parent = root->parent;
-
-    //tree->numRotations += 2;
-    tree->numRotations++;
-
-    if (root == tree->root)
-        tree->root = auxL;
-
-    root->right = auxL->left;
-    if (root->right != NULL)
-        root->right->parent = root;
-    auxR->left = auxL->right;
-    if (auxR->left != NULL) 
-        auxR->left->parent = auxR;
-    auxL->parent = root->parent;
-    if (parent != NULL) {
-        if (parent->left == root) parent->left = auxL;
-        else parent->right = auxL;
-    }
-    root->parent = auxL;
-    auxR->parent = auxL;
-    auxL->left = root;
-    auxL->right = auxR;
-
-    root->depth++;
-    auxL->depth -= 2;
-    avlInOrder(root->left, avlNodeDepthInc);
-    avlInOrder(root->right, avlNodeDepthDec);
-    avlInOrder(auxR->left, avlNodeDepthDec);
-
-    if (auxL->factor == -1) root->factor = 1;
-    else root->factor = 0;
-
-    if (auxL->factor == 1) auxR->factor = -1;
-    else auxR->factor = 0;
-
-    auxL->factor = avlNodeFactor(auxL);
-}
-
-int avlNodeFactor(NodeAVL* node) {
-    int hl = node->depth, hr = node->depth;
-
-    avlSubtreeMaxDepth(node->left, &hl);
-
-    avlSubtreeMaxDepth(node->right, &hr);
-
-    return (hl - hr);
-}
-
-void avlFactor(NodeAVL* root, int* factor) {
-    int aux = avlNodeFactor(root);
-
-    if (aux > *factor) *factor = aux;
-
-    if (root->left != NULL) avlFactor(root->left, factor);
-    if (root->right != NULL) avlFactor(root->right, factor);
+    tree->root = NULL;
+    tree->totalComparisons = tree->numRotations = 0;
 }
 
 static int avlCountNodesRecur(NodeAVL* a) {
@@ -429,7 +327,7 @@ int avlCountNodes(AVL tree) {
 void avlPrintResults(AVL tree) {
     printf("\n\n----- AVL -----");
     printf("\nNum nodos: %d", avlCountNodes(tree));
-    printf("\nAltura: %d", tree.height);
+    printf("\nAltura: %d", avlTreeHeight(tree));
     printf("\nNum rotacoes: %d", tree.numRotations);
     printf("\nComparacoes: %d", tree.totalComparisons);
 }
@@ -437,7 +335,7 @@ void avlPrintResults(AVL tree) {
 void avlFilePrintResults(AVL tree, FILE* file) {
     fprintf(file, "\n\n----- AVL -----");
     fprintf(file, "\nNum nodos: %d", avlCountNodes(tree));
-    fprintf(file, "\nAltura: %d", tree.height);
+    fprintf(file, "\nAltura: %d", avlTreeHeight(tree));
     fprintf(file, "\nNum rotacoes: %d", tree.numRotations);
     fprintf(file, "\nComparacoes: %d", tree.totalComparisons);
 }
