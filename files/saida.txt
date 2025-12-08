@@ -4,8 +4,13 @@ Altura: 636
 Num rotacoes: 0
 Comparacoes: 63552
 Tempo estimado: 2684.73 h
+<<<<<<< HEAD
 Tempo de criacao: 12.00 ms
 Tempo de busca: 1.00 ms
+=======
+Tempo de criacao: 6.00 ms
+Tempo de busca: 0.00 ms
+>>>>>>> 5263b91e9897c55cfafd4b1558419235daaf7df8
 
 ----- AVL -----
 Num nodos: 3598
@@ -13,7 +18,11 @@ Altura: 13
 Num rotacoes: 3363
 Comparacoes: 2146
 Tempo estimado: 2684.73 h
+<<<<<<< HEAD
 Tempo de criacao: 114.00 ms
+=======
+Tempo de criacao: 48.00 ms
+>>>>>>> 5263b91e9897c55cfafd4b1558419235daaf7df8
 Tempo de busca: 0.00 ms
 
 ----- RUBRO-NEGRA -----
