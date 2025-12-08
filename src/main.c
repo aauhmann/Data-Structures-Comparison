@@ -77,6 +77,7 @@ int main(int argc, char* argv[]) {
 
     // SPLAY TREE
     generationTime[SPLAYT] = TimedGamesDataToTree(steamGamesFile, &spt, SPLAYT);
+    postInsertionHeight = sptHeight(spt);
     searchTime[SPLAYT] = TimedGameTreeSearch(desiredGamesFile, &spt, SPLAYT, &estimatedTime[SPLAYT]);
     
     
