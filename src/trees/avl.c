@@ -324,22 +324,6 @@ int avlCountNodes(AVL tree) {
     
 }
 
-void avlPrintResults(AVL tree) {
-    printf("\n\n----- AVL -----");
-    printf("\nNum nodos: %d", avlCountNodes(tree));
-    printf("\nAltura: %d", avlTreeHeight(tree));
-    printf("\nNum rotacoes: %d", tree.numRotations);
-    printf("\nComparacoes: %d", tree.totalComparisons);
-}
-
-void avlFilePrintResults(AVL tree, FILE* file) {
-    fprintf(file, "\n\n----- AVL -----");
-    fprintf(file, "\nNum nodos: %d", avlCountNodes(tree));
-    fprintf(file, "\nAltura: %d", avlTreeHeight(tree));
-    fprintf(file, "\nNum rotacoes: %d", tree.numRotations);
-    fprintf(file, "\nComparacoes: %d", tree.totalComparisons);
-}
-
 NodeAVL* avlSearch(AVL* tree, char* key) {
 
     NodeAVL* aux = tree->root;

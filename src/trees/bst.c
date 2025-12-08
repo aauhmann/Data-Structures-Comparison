@@ -151,32 +151,6 @@ int bstClear(BST* tree) {
 
 }
 
-void bstPrintResults(BST tree) {
-
-    int numNodes = bstCountNodes(tree);
-    int height = bstHeight(tree);
-    int numRotations = 0;
-
-    printf("\n----- ABP -----");
-    printf("\nNum nodos: %d", numNodes);
-    printf("\nAltura: %d", height);
-    printf("\nNum rotacoes: %d", numRotations);
-    printf("\nComparacoes: %d", tree.totalComparisons);
-}
-
-void bstFilePrintResults(BST tree, FILE* file) {
-
-    int numNodes = bstCountNodes(tree);
-    int height = bstHeight(tree);
-    int numRotations = 0;
-
-    fprintf(file, "----- ABP -----");
-    fprintf(file, "\nNum nodos: %d", numNodes);
-    fprintf(file, "\nAltura: %d", height);
-    fprintf(file, "\nNum rotacoes: %d", numRotations);
-    fprintf(file, "\nComparacoes: %d", tree.totalComparisons);
-}
-
 NodeBST* bstSearch(BST* tree, char* key) {
 
     NodeBST* aux = tree->root;

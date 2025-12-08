@@ -1,7 +1,6 @@
 #include "trees.h"
 #include "cronometer.h"
-#include <string.h>
-#include <stdlib.h>
+#include "printResults.h"
 
 #define DELIMITERS ",\n"
 #define STEAM_GAMES argv[1]
@@ -9,9 +8,6 @@
 #define OUTPUT_FILE argv[3]
 #define NUM_ARGS 4
 
-void printResults(float* estimatedTime, float* creationTime, float* searchTime, BST bst, AVL avl, RBT rbt, SPT spt);
-void fprintResults(FILE* file, float* estimatedTime, float* creationTime, float* searchTime, BST bst, AVL avl, RBT rbt, SPT spt);
-typedef bool (*TreeInsertFunction)(void* tree, Game game);
 float TimedGamesDataToTree(FILE* file, void* tree, Trees type);
 float TimedGameTreeSearch(FILE* desiredGamesFile, void* tree, Trees type, float* estimatedTime);
 
@@ -32,8 +28,6 @@ int main(int argc, char* argv[]) {
     float searchTime[NUM_TREES];
     float estimatedTime[NUM_TREES];
 
-    //FILE* file[NUM_TREES] = {}
-
     FILE* steamGamesFile = fopen(STEAM_GAMES, "r");
     FILE* desiredGamesFile = fopen(DESIRED_GAMES, "r");
     FILE* outputFile = fopen(OUTPUT_FILE, "w");
@@ -43,7 +37,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     
-    if (desiredGamesFile == NULL) {       // Checks file opening
+    if (desiredGamesFile == NULL) {       
         printf("Erro ao abrir o arquivo %s", DESIRED_GAMES);
         return 1;
     }
@@ -98,50 +92,6 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-void printResults(float* estimatedTime, float* generationTime, float* searchTime, BST bst, AVL avl, RBT rbt, SPT spt) {
-    bstPrintResults(bst);
-    printf("\nTempo estimado: %.2f h", estimatedTime[BSTT]);
-    printf("\nTempo de criacao: %.2f ms", generationTime[BSTT]);
-    printf("\nTempo de busca: %.2f ms", searchTime[BSTT]);
-    
-    avlPrintResults(avl);
-    printf("\nTempo estimado: %.2f h", estimatedTime[AVLT]);
-    printf("\nTempo de criacao: %.2f ms", generationTime[AVLT]);
-    printf("\nTempo de busca: %.2f ms", searchTime[AVLT]);
-
-    rbtPrintResults(rbt);
-    printf("\nTempo estimado: %.2f h", estimatedTime[RBTT]);
-    printf("\nTempo de criacao: %.2f ms", generationTime[RBTT]);
-    printf("\nTempo de busca: %.2f ms", searchTime[RBTT]);
-    
-    sptPrintResults(spt);
-    printf("\nTempo estimado: %.2f h", estimatedTime[SPLAYT]);
-    printf("\nTempo de criacao: %.2f ms", generationTime[SPLAYT]);
-    printf("\nTempo de busca: %.2f ms", searchTime[SPLAYT]);
-}
-
-void fprintResults(FILE* file, float* estimatedTime, float* generationTime, float* searchTime, BST bst, AVL avl, RBT rbt, SPT spt) {
-    bstFilePrintResults(bst, file);
-    fprintf(file, "\nTempo estimado: %.2f h", estimatedTime[BSTT]);
-    fprintf(file, "\nTempo de criacao: %.2f ms", generationTime[BSTT]);
-    fprintf(file, "\nTempo de busca: %.2f ms", searchTime[BSTT]);
-    
-    avlFilePrintResults(avl, file);
-    fprintf(file, "\nTempo estimado: %.2f h", estimatedTime[AVLT]);
-    fprintf(file, "\nTempo de criacao: %.2f ms", generationTime[AVLT]);
-    fprintf(file, "\nTempo de busca: %.2f ms", searchTime[AVLT]);
-    
-    rbtFilePrintResults(rbt, file);
-    fprintf(file, "\nTempo estimado: %.2f h", estimatedTime[RBTT]);
-    fprintf(file, "\nTempo de criacao: %.2f ms", generationTime[RBTT]);
-    fprintf(file, "\nTempo de busca: %.2f ms", searchTime[RBTT]);
-    
-    sptFilePrintResults(spt, file);
-    fprintf(file, "\nTempo estimado: %.2f h", estimatedTime[SPLAYT]);
-    fprintf(file, "\nTempo de criacao: %.2f ms", generationTime[SPLAYT]);
-    fprintf(file, "\nTempo de busca: %.2f ms", searchTime[SPLAYT]);
-}
-
 float TimedGamesDataToTree(FILE* file, void* tree, Trees type) {
 
     Cronometer insertionCron = cronNew();
@@ -159,8 +109,6 @@ float TimedGamesDataToTree(FILE* file, void* tree, Trees type) {
 
         treeInsert(tree, game, type);      // Inserts into the tree   
         
-        // if (type == SPLAYT)
-        //     sptPrint(*(SPT*)tree);
     }
     
     cronStop(&insertionCron);

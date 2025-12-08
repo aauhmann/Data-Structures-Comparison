@@ -344,20 +344,3 @@ static int sptCountNodesRecursive(NodeSPT* a) {
 int sptCountNodes(SPT tree) {
     return sptCountNodesRecursive(tree.root);
 }
-
-void sptPrintResults(SPT tree) {
-    printf("\n\n----- SPLAY -----");
-    printf("\nNum nodos: %d", sptCountNodes(tree));
-    printf("\nAltura pos insercao: %d", postInsertionHeight);
-    printf("\nAltura final: %d", sptHeight(tree));
-    printf("\nNum rotacoes: %d", tree.numRotations);
-    printf("\nComparacoes: %d", tree.totalComparisons);
-}
-
-void sptFilePrintResults(SPT tree, FILE* file) {
-    fprintf(file, "\n\n----- SPLAY -----");
-    fprintf(file, "\nNum nodos: %d", sptCountNodes(tree));
-    fprintf(file, "\nAltura: %d", sptHeight(tree));
-    fprintf(file, "\nNum rotacoes: %d", tree.numRotations);
-    fprintf(file, "\nComparacoes: %d", tree.totalComparisons);
-}

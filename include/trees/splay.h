@@ -29,5 +29,4 @@ void sptPrint(SPT tree);
 int sptHeight(SPT tree);
 void sptNodeDelete(SPT* tree, type data);
 void sptClear(SPT* tree);
-void sptPrintResults(SPT tree);
-void sptFilePrintResults(SPT tree, FILE* file);
+int sptCountNodes(SPT tree);

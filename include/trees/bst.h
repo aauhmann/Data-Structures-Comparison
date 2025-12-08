@@ -43,15 +43,5 @@ int bstHeight(BST tree);
 /// @return 0 == ERROR, 1 == SUCCESS
 int bstClear(BST* tree);
 
-/// @brief Prints numNodes, height, numRotations, numComparisons
-/// @param tree 
-void bstPrintResults(BST tree);
-
-/// @brief Prints numNodes, height, numRotations, numComparisons on the file
-/// @brief ### FILE MUST BE ALREADY OPEN ON W MODE
-/// @param tree 
-/// @param file 
-void bstFilePrintResults(BST tree, FILE* file);
-
 //FUNÇÃO VIVIANE
 NodeBST* bstSearch(BST* tree, char* key);
