@@ -1,21 +1,35 @@
 #include "cronometer.h"
 
+static double qpFreq = 0;
+static bool isFreqSet = 0;
+
 Cronometer cronNew() {
-    return (Cronometer){0, 0};
+    if (!isFreqSet) {
+        LARGE_INTEGER f;
+        QueryPerformanceFrequency(&f);
+        qpFreq = f.QuadPart;
+        isFreqSet = true;
+    }
+
+    Cronometer cron;
+    cron.millisec = 0;
+    cron.base.QuadPart = 0;
+    return cron;
 }
 
 void cronStart(Cronometer* cron) {
-    cron->base = clock();
+    QueryPerformanceCounter(&cron->base);
 }
 
 void cronStop(Cronometer* cron) {
-    clock_t end = clock();
+    LARGE_INTEGER end;
+    QueryPerformanceCounter(&end);
 
-    cron->millisec += (float)(end - cron->base)/CLOCKS_PER_SEC*1000;
+    cron->millisec += (end.QuadPart - cron->base.QuadPart)*TICKS_PER_SEC/qpFreq;
 
 }
 
 void cronReset(Cronometer* cron) {
-    cron->base = 0;
+    cron->base.QuadPart = 0;
     cron->millisec = 0;
 }

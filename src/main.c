@@ -146,6 +146,8 @@ float TimedGamesDataToTree(FILE* file, void* tree, Trees type) {
     Cronometer insertionCron = cronNew();
     char line[1000];
 
+    cronStart(&insertionCron);
+
     // Dataset loop
     while (fgets(line, sizeof(line), file)) {
         char *word = strtok(line, DELIMITERS);      // Gets the game's name(first word)
@@ -154,13 +156,13 @@ float TimedGamesDataToTree(FILE* file, void* tree, Trees type) {
         
         strncpy(game.name, word, strlen(word) + 1);  // Puts the game's name into the struct
 
-        cronStart(&insertionCron);
         treeInsert(tree, game, type);      // Inserts into the tree   
-        cronStop(&insertionCron);
-
+        
         // if (type == SPLAYT)
         //     sptPrint(*(SPT*)tree);
     }
+    
+    cronStop(&insertionCron);
 
     return insertionCron.millisec;
 }
@@ -171,13 +173,13 @@ float TimedGameTreeSearch(FILE* desiredGamesFile, void* tree, Trees type, float*
     char line[1000];
     *estimatedTime = 0;
     
+    cronStart(&searchCron);
+
     // Search loop
     while (fgets(line, sizeof(line), desiredGamesFile)) {   
        
-        cronStart(&searchCron);
         void* desiredGame = treeSearch(tree, strtok(line, DELIMITERS), type);   // Gets desired game's name and search it on the tree
-        cronStop(&searchCron);
-
+        
         if (desiredGame != NULL) {  // Game was found in the dataset
             
             switch (type) {
@@ -202,8 +204,11 @@ float TimedGameTreeSearch(FILE* desiredGamesFile, void* tree, Trees type, float*
                     break;
                 }
             }
-
+            
         } 
     }
+
+    cronStop(&searchCron);
+
     return searchCron.millisec;
 }
