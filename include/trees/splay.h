@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+extern int postInsertionHeight;
+
 typedef Game type;
 
 typedef struct s_SplayNode {

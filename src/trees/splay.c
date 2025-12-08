@@ -2,6 +2,8 @@
 #include "strcompare.h"
 #include <stdlib.h>
 
+int postInsertionHeight = 0;
+
 SPT sptNew() {
     return (SPT){NULL, 0, 0}; // Returns an empty splay tree with zeroed rotations and comparisons counters
 }
@@ -328,7 +330,8 @@ int sptCountNodes(SPT tree) {
 void sptPrintResults(SPT tree) {
     printf("\n\n----- SPLAY -----");
     printf("\nNum nodos: %d", sptCountNodes(tree));
-    printf("\nAltura: %d", sptHeight(tree));
+    printf("\nAltura pos insercao: %d", postInsertionHeight);
+    printf("\nAltura final: %d", sptHeight(tree));
     printf("\nNum rotacoes: %d", tree.numRotations);
     printf("\nComparacoes: %d", tree.totalComparisons);
 }

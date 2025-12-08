@@ -1,6 +1,11 @@
 ----- ABP -----
+<<<<<<< HEAD
 Num nodos: 3572
 Altura: 636
+=======
+Num nodos: 658
+Altura: 21
+>>>>>>> b1347759647ec6a579041ae0ef0a4a619ab10973
 Num rotacoes: 0
 Comparacoes: 63552
 Tempo estimado: 2684.73 h
