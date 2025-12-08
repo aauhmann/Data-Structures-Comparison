@@ -1,10 +1,12 @@
 #pragma once
 
-#include <time.h>
+#include <windows.h>
+
+#define TICKS_PER_SEC 1000
 
 typedef struct {
-    clock_t base;
-    float millisec;
+    LARGE_INTEGER base;
+    double millisec; 
 } Cronometer;
 
 Cronometer cronNew();
