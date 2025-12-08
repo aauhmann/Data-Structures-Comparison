@@ -1,40 +1,35 @@
 ----- ABP -----
-<<<<<<< HEAD
-Num nodos: 3572
-Altura: 636
-=======
 Num nodos: 658
 Altura: 21
->>>>>>> b1347759647ec6a579041ae0ef0a4a619ab10973
 Num rotacoes: 0
-Comparacoes: 63552
-Tempo estimado: 2684.73 h
-Tempo de criacao: 14.82 ms
-Tempo de busca: 1.13 ms
+Comparacoes: 544
+Tempo estimado: 139.79 h
+Tempo de criacao: 1.16 ms
+Tempo de busca: 0.08 ms
 
 ----- AVL -----
-Num nodos: 3572
-Altura: 13
-Num rotacoes: 4266
-Comparacoes: 2147
-Tempo estimado: 2684.73 h
-Tempo de criacao: 82.09 ms
-Tempo de busca: 0.16 ms
+Num nodos: 658
+Altura: 11
+Num rotacoes: 330
+Comparacoes: 401
+Tempo estimado: 139.79 h
+Tempo de criacao: 1.66 ms
+Tempo de busca: 0.04 ms
 
 ----- RUBRO-NEGRA -----
-Num nodos: 3572
-Altura: 21
-Num rotacoes: 3249
-Comparacoes: 2192
-Tempo estimado: 2684.73 h
-Tempo de criacao: 6.60 ms
-Tempo de busca: 0.15 ms
+Num nodos: 658
+Altura: 11
+Num rotacoes: 269
+Comparacoes: 402
+Tempo estimado: 139.79 h
+Tempo de criacao: 0.94 ms
+Tempo de busca: 0.04 ms
 
 ----- SPLAY -----
-Num nodos: 3572
-Altura: 94
-Num rotacoes: 26238
-Comparacoes: 21679
-Tempo estimado: 2684.73 h
-Tempo de criacao: 5.26 ms
-Tempo de busca: 0.88 ms
+Num nodos: 658
+Altura: 24
+Num rotacoes: 4295
+Comparacoes: 519
+Tempo estimado: 139.79 h
+Tempo de criacao: 1.04 ms
+Tempo de busca: 0.05 ms

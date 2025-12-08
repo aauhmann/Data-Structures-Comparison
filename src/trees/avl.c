@@ -89,19 +89,18 @@ static void avlRotateLeft(NodeAVL* child, NodeAVL* node, NodeAVL* father) {
 }
 
 static void avlRotation(NodeAVL* node, NodeAVL* father, AVL* tree) {
+    tree->numRotations++;
     if (node->factor > 1) {
         if (node->left->factor > 0) {
             // Right rotation case
             if (node == tree->root) tree->root = node->left; // Updates tree's root
             avlRotateRight(node->left, node, father);
-            tree->numRotations++;
         }
         else { // If node->left->factor < 0
             // Double right rotation case
             if (node == tree->root) tree->root = node->left->right; // Updates tree's root
             avlRotateLeft(node->left->right, node->left, node);
             avlRotateRight(node->left, node, father);
-            tree->numRotations += 2;
         }
     }
     else { // node->factor < -1
@@ -109,19 +108,17 @@ static void avlRotation(NodeAVL* node, NodeAVL* father, AVL* tree) {
             // Left rotation case
             if (node == tree->root) tree->root = node->right; // Updates tree's root
             avlRotateLeft(node->right, node, father);
-            tree->numRotations++;
         }
         else { // If node->right->factor > 0
             // Double left rotation case
             if (node == tree->root) tree->root = node->right->left; // Updates tree's root
             avlRotateRight(node->right->left, node->right, node);
             avlRotateLeft(node->right, node, father);
-            tree->numRotations += 2;
         }
     }
 }
 
-static NodeAVL* avlInsertRecursion(NodeAVL* node, NodeAVL* father, type key, AVL* tree) {
+static NodeAVL* avlInsertRecursion(NodeAVL* node, NodeAVL* father, type key, AVL* tree, bool* needFactorCheck) {
     if (node == NULL) {
         // Empty space to insertion
         NodeAVL* new = (NodeAVL*)malloc(sizeof(NodeAVL));
@@ -144,17 +141,19 @@ static NodeAVL* avlInsertRecursion(NodeAVL* node, NodeAVL* father, type key, AVL
     NodeAVL* aux;
 
     if (strcompare(key.name, node->key.name) < 0)
-        aux = avlInsertRecursion(node->left, node, key, tree);
+        aux = avlInsertRecursion(node->left, node, key, tree, needFactorCheck);
     else // If (key > node->key)
-        aux = avlInsertRecursion(node->right, node, key, tree);
+        aux = avlInsertRecursion(node->right, node, key, tree, needFactorCheck);
 
     // If a node has been inserted
-    if (aux != NULL) {
+    if (aux != NULL && (*needFactorCheck)) {
         avlNodeFactorBalance(node);
 
         // Case the node's unbalanced
-        if (abs(node->factor) > 1)
+        if (abs(node->factor) > 1) {
             avlRotation(node, father, tree);
+            *needFactorCheck = false;
+        }
     }
 
     return aux;
@@ -170,7 +169,8 @@ void avlInsert(AVL* tree, type key) {
         return;
     }
 
-    NodeAVL* aux = avlInsertRecursion(tree->root, NULL, key, tree);
+    bool needFactorCheck = true;
+    NodeAVL* aux = avlInsertRecursion(tree->root, NULL, key, tree, &needFactorCheck);
 
     if (aux == NULL)
         return;
