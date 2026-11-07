@@ -16,7 +16,7 @@ The results are printed to the console and written to an output file. Names are 
 
 ## Building
 
-You need GCC. The project was developed on Windows with MinGW-w64, and the commands below were tested there with GCC 15.1. Run them from the repository root:
+You need Windows and GCC, because the timer uses the Windows API. The project was developed with MinGW-w64, and the commands below were tested with GCC 15.1. Run them from the repository root:
 
 ```sh
 gcc -Wall -Iinclude -Iinclude/trees -Iinclude/utils src/*.c src/trees/*.c src/utils/*.c -o program.exe
@@ -54,11 +54,14 @@ Baldur's Gate II Enhanced Edition,475.26
 | File | Contents |
 | --- | --- |
 | `files/dataset.csv` | 3,598 games, sorted by playtime (longest first) |
-| `files/steam_games_sorted.csv` | The same 3,598 games, sorted by name |
+| `files/games_sorted.csv` | 3,572 of those games, sorted by name ignoring case, which is the order the trees use |
+| `files/steam_games_sorted.csv` | The same 3,572 games, sorted by name with uppercase before lowercase |
 | `files/teste.csv` | A smaller set of 658 games from the dataset |
 | `files/lista_jogador1.txt` | 197 games to search for, all different |
 | `files/lista_teste.txt` | 46 games to search for, intended for `teste.csv` |
 | `files/saida.txt` | Output file used by the VS Code launch configuration |
+
+The two sorted files leave out the 26 games in `dataset.csv` whose names start with a lowercase letter, such as `theHunter`. None of those games are in `lista_jogador1.txt`.
 
 ### Output
 
@@ -68,11 +71,11 @@ Each tree gets a block like this one. The labels are in Portuguese:
 ----- AVL -----
 Num nodos: 3598
 Altura: 14
-Num rotacoes: 2726
+Num rotacoes: 1809
 Comparacoes: 2154
 Tempo estimado: 2684.73 h
-Tempo de criacao: 249.00 ms
-Tempo de busca: 0.00 ms
+Tempo de criacao: 123.26 ms
+Tempo de busca: 0.38 ms
 ```
 
 | Label | Meaning |
@@ -80,54 +83,56 @@ Tempo de busca: 0.00 ms
 | `ABP`, `RUBRO-NEGRA` (`RBT` on the console) | BST and red-black tree |
 | `Num nodos` | Number of nodes |
 | `Altura` | Height, counted in nodes (a single node has height 1) |
-| `Num rotacoes` | Rotations performed |
+| `Num rotacoes` | Rotations, with a double rotation counted as one |
 | `Comparacoes` | Nodes visited during searches |
 | `Tempo estimado` | Total playtime of the games found, in hours |
-| `Tempo de criacao` | Total insertion time |
-| `Tempo de busca` | Total search time |
+| `Tempo de criacao` | Time to read the games file and build the tree |
+| `Tempo de busca` | Time to read the search list and run the searches |
 
 For the splay tree, the console shows two heights, one after insertion (`Altura pos insercao`) and one after the searches (`Altura final`). The output file only has the final height.
 
 ## Results
 
-These results come from searching for `lista_jogador1.txt` in both orderings of the full dataset. The counts are the same on every run. All four trees found 196 of the 197 games and estimated the same 2,684.73 hours in every run shown here.
+These results come from searching for `lista_jogador1.txt` in `dataset.csv` and in `games_sorted.csv`. The counts were the same on every run. All four trees found 196 of the 197 games and estimated the same 2,684.73 hours on both files.
 
 Times are medians of 7 runs on one Windows machine, built without compiler optimizations.
 
-### `dataset.csv` (sorted by playtime, so names arrive in effectively random order)
+### `dataset.csv` (3,598 games sorted by playtime, so names arrive in effectively random order)
 
-| Tree | Height | Rotations | Search comparisons | Build time |
-| --- | --- | --- | --- | --- |
-| BST | 28 | 0 | 3,049 | 8 ms |
-| AVL | 14 | 2,726 | 2,154 | 299 ms |
-| Red-black | 15 | 1,480 | 2,162 | 10 ms |
-| Splay | 30 (40 after insertion) | 62,551 | 3,311 | 10 ms |
+| Tree | Height | Rotations | Search comparisons | Build time | Search time |
+| --- | --- | --- | --- | --- | --- |
+| BST | 28 | 0 | 3,049 | 11 ms | 0.44 ms |
+| AVL | 14 | 1,809 | 2,154 | 122 ms | 0.36 ms |
+| Red-black | 15 | 1,480 | 2,162 | 11 ms | 0.36 ms |
+| Splay | 30 (40 after insertion) | 32,235 | 3,311 | 14 ms | 0.63 ms |
 
-### `steam_games_sorted.csv` (sorted by name)
+### `games_sorted.csv` (3,572 games in the order the trees sort them)
 
-| Tree | Height | Rotations | Search comparisons | Build time |
-| --- | --- | --- | --- | --- |
-| BST | 636 | 0 | 63,552 | 37 ms |
-| AVL | 13 | 4,284 | 2,146 | 290 ms |
-| Red-black | 21 | 3,255 | 2,192 | 8 ms |
-| Splay | 94 (642 after insertion) | 45,905 | 10,030 | 8 ms |
-
-Median total search time was 4 ms or less for every tree, too close to the timer's resolution to compare.
+| Tree | Height | Rotations | Search comparisons | Build time | Search time |
+| --- | --- | --- | --- | --- | --- |
+| BST | 3,572 | 0 | 351,650 | 138 ms | 15.1 ms |
+| AVL | 12 | 3,560 | 2,135 | 12 ms | 0.37 ms |
+| Red-black | 21 | 3,551 | 2,228 | 12 ms | 0.42 ms |
+| Splay | 97 (3,572 after insertion) | 11,705 | 23,500 | 7 ms | 1.92 ms |
 
 ### What the results show
 
-- **Insertion order matters most for the BST.** Sorted input makes it about 23 times taller and multiplies its search comparisons by about 21. AVL and red-black search costs barely change.
-- **AVL gives the shortest trees, but only by a small margin.** It needs 0.4% to 2% fewer search comparisons than the red-black tree, and more rotations to get there.
-- **The splay tree does the most rotating here.** It restructures on every access, and this workload gives that little to exploit, because each game is searched for only once.
+- **Sorted input turns the BST into a linked list.** Its height equals its node count, and it needs about 115 times as many search comparisons as on the other file.
+- **AVL and red-black trees barely notice the insertion order.** Their search comparisons stay between about 2,100 and 2,250 on both files.
+- **AVL gives the shorter trees.** It needs 0.4% to 4% fewer search comparisons than the red-black tree.
+- **The splay tree does the most rotating.** On sorted input, insertion is fast but leaves a chain as tall as the BST's. The searches then reshape it, bringing the height down to 97 after only 197 lookups. It needs about 15 times fewer comparisons than the BST there, but about 11 times more than the AVL tree.
+- **This workload doesn't play to the splay tree's strength.** Each game is searched for only once, so it gets no benefit from keeping recently used nodes near the root.
+
+`steam_games_sorted.csv` falls between the two main files. It is sorted with uppercase before lowercase (`AZMD!` comes before `AaAaAA!!!`), but the trees ignore case, so they see 123 ascending runs rather than one. The BST reaches a height of 636 with 63,552 search comparisons.
 
 ### Reading these numbers
 
-- **The AVL build time reflects this implementation, not AVL trees in general.** Balance factors are recalculated by measuring subtree heights recursively at each node on the insertion path, rather than being updated incrementally, so a single insertion can walk most of the tree. That extra work explains why it is so much slower than the others.
-- **The "sorted" file isn't quite worst-case for the BST.** It is sorted case-sensitively (`AZMD!` comes before `AaAaAA!!!`), but the trees compare case-insensitively. To the trees, the file looks like 126 ascending runs, so the BST reaches height 636 rather than 3,598.
-- **Rotation counts aren't fully comparable.** A double rotation counts as 2 in the AVL tree and as 1 in the red-black tree.
+- **The AVL build time depends on how often it rotates.** Balance factors are recalculated by measuring subtree heights recursively on the way back up the insertion path, and this stops after the first rotation. In sorted input nearly every insertion rotates, so the work usually ends early. In `dataset.csv` many insertions don't rotate, so the work continues up to the root, which is why that build takes about 10 times longer. This cost comes from this implementation, not from AVL trees in general.
+- **Times cover more than tree operations.** The timer runs around the whole loop, so it includes reading and parsing lines and allocating names.
+- **Small differences in time aren't meaningful.** For example, the splay build on `games_sorted.csv` ranged from 6 to 12.5 ms across the 7 runs.
 - **Rotations and comparisons cover different phases.** Rotations include insertion, and splay rotations include searches too. Comparisons are only counted during searches.
-- **Small timings are mostly noise.** The timer runs around each individual operation and ticks in whole milliseconds on the test machine, so values of a few milliseconds vary widely between runs.
-- **The splay tree moves accessed nodes up one rotation at a time.** It rotates a node with its parent at every level, without the paired zig-zig and zig-zag steps of a textbook splay. Its heights and rotation counts may differ from a textbook version.
+- **The splay tree moves accessed nodes up one rotation at a time.** It rotates a node with its parent at every level, without the paired zig-zig and zig-zag steps of a textbook splay, so its shape may differ from a textbook version.
+- **The splay rotation count is halved.** The counter reports half of the single rotations performed on each access, rounded up, to match counting those paired steps as one. The number of rotations actually performed is about twice what it shows.
 
 ## Project structure
 
@@ -135,9 +140,9 @@ Median total search time was 4 ms or less for every tree, too close to the timer
 ├── include/
 │   ├── game.h              # Game record (name and playtime)
 │   ├── trees/              # Tree interfaces
-│   └── utils/              # Timer and string comparison interfaces
+│   └── utils/              # Timer, report and string comparison interfaces
 ├── src/
-│   ├── main.c              # Argument handling, file reading, timing and reports
+│   ├── main.c              # Argument handling, file reading and timing
 │   ├── trees/
 │   │   ├── bst.c           # Binary search tree
 │   │   ├── avl.c           # AVL tree
@@ -145,7 +150,8 @@ Median total search time was 4 ms or less for every tree, too close to the timer
 │   │   ├── splay.c         # Splay tree
 │   │   └── trees.c         # Common insert and search interface for all trees
 │   └── utils/
-│       ├── cronometer.c    # Timer built on clock()
+│       ├── chronometer.c   # Timer built on the Windows performance counter
+│       ├── printResults.c  # Console and output file reports
 │       └── strcompare.c    # Case-insensitive string comparison
 └── files/                  # Datasets, search lists and output
 ```
