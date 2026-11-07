@@ -111,7 +111,16 @@ NodeSPT* sptSearch(SPT* tree, char* key) {
         return NULL;
     }
 
-    NodeSPT* aux = sptAccessSearch(tree->root, NULL, key, &tree->numRotations, &tree->totalComparisons);
+    int rotation = 0;
+    NodeSPT* aux = sptAccessSearch(tree->root, NULL, key, &rotation, &tree->totalComparisons);
+
+    // Fixes the Splay rotations number
+    if (rotation%2 == 0)
+        rotation = rotation/2;
+    else
+        rotation = (rotation - 1)/2 + 1;
+
+    tree->numRotations += rotation;
 
     tree->root = aux;
 
@@ -134,7 +143,16 @@ void sptInsert(SPT* tree, type data) {
         return;
     }
 
-    NodeSPT* aux = sptAccessSearch(tree->root, NULL, data.name, &tree->numRotations, NULL);
+    int rotation = 0;
+    NodeSPT* aux = sptAccessSearch(tree->root, NULL, data.name, &rotation, NULL);
+
+    // Fixes the Splay rotations number
+    if (rotation%2 == 0)
+        rotation = rotation/2;
+    else
+        rotation = (rotation - 1)/2 + 1;
+
+    tree->numRotations += rotation;
 
     tree->root = aux;
 
@@ -325,21 +343,4 @@ static int sptCountNodesRecursive(NodeSPT* a) {
 
 int sptCountNodes(SPT tree) {
     return sptCountNodesRecursive(tree.root);
-}
-
-void sptPrintResults(SPT tree) {
-    printf("\n\n----- SPLAY -----");
-    printf("\nNum nodos: %d", sptCountNodes(tree));
-    printf("\nAltura pos insercao: %d", postInsertionHeight);
-    printf("\nAltura final: %d", sptHeight(tree));
-    printf("\nNum rotacoes: %d", tree.numRotations);
-    printf("\nComparacoes: %d", tree.totalComparisons);
-}
-
-void sptFilePrintResults(SPT tree, FILE* file) {
-    fprintf(file, "\n\n----- SPLAY -----");
-    fprintf(file, "\nNum nodos: %d", sptCountNodes(tree));
-    fprintf(file, "\nAltura: %d", sptHeight(tree));
-    fprintf(file, "\nNum rotacoes: %d", tree.numRotations);
-    fprintf(file, "\nComparacoes: %d", tree.totalComparisons);
 }

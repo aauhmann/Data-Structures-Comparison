@@ -51,15 +51,5 @@ int rbtHeight(RBT tree);
 /// @return true(success)/false(error)
 bool rbtClear(RBT* tree);
 
-/// @brief Prints numNodes, height, numRotations, numComparisons
-/// @param tree 
-void rbtPrintResults(RBT tree);
-
-/// @brief Prints numNodes, height, numRotations, numComparisons on the file
-/// @brief ### FILE MUST BE ALREADY OPEN ON W MODE
-/// @param tree 
-/// @param file 
-void rbtFilePrintResults(RBT tree, FILE* file);
-
 //FUNÇÃO VIVIANE
 NodeRBT* rbtSearch(RBT* tree, char* key);

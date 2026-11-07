@@ -1,35 +1,35 @@
 ----- ABP -----
-Num nodos: 658
-Altura: 21
+Num nodos: 3572
+Altura: 3572
 Num rotacoes: 0
-Comparacoes: 3049
+Comparacoes: 351650
 Tempo estimado: 2684.73 h
-Tempo de criacao: 4.00 ms
-Tempo de busca: 0.00 ms
+Tempo de criacao: 95.66 ms
+Tempo de busca: 6.00 ms
 
 ----- AVL -----
-Num nodos: 3598
-Altura: 14
-Num rotacoes: 2726
-Comparacoes: 2154
+Num nodos: 3572
+Altura: 12
+Num rotacoes: 3560
+Comparacoes: 2135
 Tempo estimado: 2684.73 h
-Tempo de criacao: 100.00 ms
-Tempo de busca: 0.00 ms
+Tempo de criacao: 7.83 ms
+Tempo de busca: 0.13 ms
 
 ----- RUBRO-NEGRA -----
-Num nodos: 3598
-Altura: 15
-Num rotacoes: 1480
-Comparacoes: 2162
+Num nodos: 3572
+Altura: 21
+Num rotacoes: 3551
+Comparacoes: 2228
 Tempo estimado: 2684.73 h
-Tempo de criacao: 4.00 ms
-Tempo de busca: 1.00 ms
+Tempo de criacao: 8.75 ms
+Tempo de busca: 0.16 ms
 
 ----- SPLAY -----
-Num nodos: 3598
-Altura: 30
-Num rotacoes: 62551
-Comparacoes: 3311
+Num nodos: 3572
+Altura: 97
+Num rotacoes: 11705
+Comparacoes: 23500
 Tempo estimado: 2684.73 h
-Tempo de criacao: 6.00 ms
-Tempo de busca: 0.00 ms
+Tempo de criacao: 7.07 ms
+Tempo de busca: 1.67 ms

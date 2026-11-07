@@ -161,22 +161,6 @@ int rbtCountNodes(RBT tree) {
     return rbCountNodesRecur(tree.root);
 }
 
-void rbtPrintResults(RBT tree) {
-    printf("\n\n----- RBT -----");
-    printf("\nNum nodos: %d", rbtCountNodes(tree));
-    printf("\nAltura: %d", rbtHeight(tree));
-    printf("\nNum rotacoes: %d", tree.numRotations);
-    printf("\nComparacoes: %d", tree.totalComparisons);
-}
-
-void rbtFilePrintResults(RBT tree, FILE* file) {
-    fprintf(file, "\n\n----- RUBRO-NEGRA -----");
-    fprintf(file, "\nNum nodos: %d", rbtCountNodes(tree));
-    fprintf(file, "\nAltura: %d", rbtHeight(tree));
-    fprintf(file, "\nNum rotacoes: %d", tree.numRotations);
-    fprintf(file, "\nComparacoes: %d", tree.totalComparisons);
-}
-
 NodeRBT* rbtSearch(RBT* tree, char* key) {
 
     NodeRBT* aux = tree->root;

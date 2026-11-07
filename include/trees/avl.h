@@ -30,6 +30,5 @@ void avlPrint(AVL tree);
 int avlTreeHeight(AVL tree);
 int avlTreeFactor(AVL tree);
 void avlClear(AVL* tree);
-void avlPrintResults(AVL tree);
-void avlFilePrintResults(AVL tree, FILE* file);
+int avlCountNodes(AVL tree);
 NodeAVL* avlSearch(AVL* tree, char* key);
